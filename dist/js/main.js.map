@@ -1,0 +1,1 @@
+{"version":3,"sources":["script.js"],"names":["$","on","toggleClass"],"mappings":"AACAA,EAAA,QAAA,EAAAC,GAAA,QAAA,WACAD,EAAA,QAAA,EAAAE,YAAA,QAAA,CACA,CACA","file":"main.js","sourcesContent":["// on mouse click toggle class 'closed' on all elements with class 'doors'\n$('.doors').on('click', function () {\n    $('.doors').toggleClass('closed');\n}\n);\n"]}

@@ -1,0 +1,214 @@
+body {
+    background-color: black;
+    color: white;
+    text-align: center;
+}
+
+button {
+    background-color: black;
+    border: 1px solid white;
+    color: white;
+    padding: 10px 30px;
+
+    &:hover {
+        background-color: white;
+        color: black;
+        transition: all 0.3s ease-in-out;
+        cursor: pointer;
+    }
+}
+
+#maze {
+    box-sizing: content-box;
+    margin: 30px auto;
+    width: 400px;
+    height: 400px;
+    outline: 2px solid white;
+    position: relative;
+}
+
+.doors {
+    position: absolute;
+    background-color: black;
+
+    &::before,
+    &::after {
+        content: '';
+        position: absolute;
+        transition: all 0.3s ease-in-out;
+        background-color: white;
+    }
+
+    &--north, &--south {
+        width: 80px;
+        height: 4px;
+
+        &::before, &::after {
+            height: 40px;
+            width: 2px;
+        }
+    }
+
+    &--north {
+        top: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+
+        &::before {
+            top: 1px;
+            left: calc(50% - 41px);
+            transform-origin: top center;
+        }
+
+        &::after {
+            top: 1px;
+            left: calc(50% + 40px);
+            transform-origin: top center;
+        }
+    }
+
+    &--south {
+        bottom: -2px;
+        left: 50%;
+        transform: translateX(-50%);
+
+        &::before {
+            bottom: 1px;
+            left: calc(50% - 41px);
+            transform-origin: bottom center;
+        }
+
+        &::after {
+            bottom: 1px;
+            left: calc(50% + 40px);
+            transform-origin: bottom center;
+        }
+    }
+
+    &--east, &--west {
+        height: 80px;
+        width: 4px;
+
+        &::before, &::after {
+            width: 40px;
+            height: 2px;
+        }
+    }
+
+    &--east {
+        top: 50%;
+        right: -2px;
+        transform: translateY(-50%);
+
+        &::before {
+            top: calc(50% - 41px);
+            right: 1px;
+            transform-origin: center right;
+        }
+
+        &::after {
+            top: calc(50% + 40px);
+            right: 1px;
+            transform-origin: center right;
+        }
+    }
+
+    &--west {
+        top: 50%;
+        left: -2px;
+        transform: translateY(-50%);
+
+        &::before {
+            top: calc(50% - 41px);
+            left: 1px;
+            transform-origin: center left;
+        }
+
+        &::after {
+            top: calc(50% + 40px);
+            left: 1px;
+            transform-origin: center left;
+        }
+    }
+
+    &.closed {
+        &.doors--north {
+            &::before {
+                transform: rotate(-90deg);
+            }
+            
+            &::after {
+                transform: rotate(90deg);
+            }
+        }
+        
+        &.doors--south {
+            &::before {
+                transform: rotate(90deg);
+            }
+            
+            &::after {
+                transform: rotate(-90deg);
+            }
+        }
+        
+        &.doors--east {
+            &::before {
+                transform: rotate(-90deg);
+            }
+            
+            &::after {
+                transform: rotate(90deg);
+            }
+        }
+        
+        &.doors--west {
+            &::before {
+                transform: rotate(90deg);
+            }
+            
+            &::after {
+                transform: rotate(-90deg);
+            }
+        }
+    }
+}
+
+
+.player {
+    width: 30px;
+    height: 30px;
+    background-color: blue;
+    position: absolute;
+}
+
+.game {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+
+    * {
+        flex-grow: 1;
+    }
+    
+
+    &__input {
+        height: 35px;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+        font-size: 24px;
+    }
+
+    &__main {
+        
+    }
+
+    &__interface {
+        flex: 1;
+    }
+
+    &__stats {
+        flex: 1;
+    }
+}
