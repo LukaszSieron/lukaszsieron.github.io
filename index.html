@@ -10,22 +10,23 @@
 </head>
 <body>
     <div class="header">
-        <h1>THE TROL DUNGEON</h1>
+        <h1>THE TROLL DUNGEON</h1>
     </div>
     <div class="container"></div>
     <div class="game">
         <div id="interface" class="game__interface">
             <button onclick="startGame()">Start Game</button>
         </div>
-        <div class="game__main">
-            <h2 id="announcer">Type direction of your adventure!</h2>        
-            <div id="maze">
-                <span class="doors doors--north"></span>
-                <span class="doors doors--east"></span>
-                <span class="doors doors--south"></span>
-                <span class="doors doors--west"></span>
+        <div class="game__main">        
+            <div class="maze" id="maze">
+                <div class="maze__announcer">
+                    Type 'start' to begin your adventure!
+                </div>
+                <div id="encounter" class="maze__encounter">
+                </div>
+                <img src="./dist/assets/hero2.png" alt="Hero" class="hero">
             </div>
-            <input class="game__input" type="text">
+            <input id="userInput" class="game__input" type="text">
         </div>
         <div class="game__stats">
             <h2>Score: <span id="score">1000</span></h2>

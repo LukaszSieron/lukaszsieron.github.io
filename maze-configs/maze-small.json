@@ -1,0 +1,21 @@
+{
+    "mazeSize": 3,
+    "exit": { "x": 2, "y": 2 },
+    "rooms": [
+        [
+            { "doors": { "north": false, "east": true, "south": true, "west": false }, "encounter": "diamond" },
+            { "doors": { "north": false, "east": true, "south": true, "west": true }, "encounter": null },
+            { "doors": { "north": false, "east": false, "south": true, "west": true }, "encounter": "white_troll" }
+        ],
+        [
+            { "doors": { "north": true, "east": true, "south": true, "west": false }, "encounter": "emerald" },
+            { "doors": { "north": true, "east": true, "south": true, "west": true }, "encounter": "green_troll" },
+            { "doors": { "north": true, "east": false, "south": true, "west": true }, "encounter": null }
+        ],
+        [
+            { "doors": { "north": true, "east": true, "south": false, "west": false }, "encounter": null },
+            { "doors": { "north": true, "east": true, "south": false, "west": true }, "encounter": "gold" },
+            { "doors": { "north": true, "east": false, "south": false, "west": true }, "encounter": null }
+        ]
+    ]
+}

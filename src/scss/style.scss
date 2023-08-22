@@ -18,13 +18,65 @@ button {
     }
 }
 
-#maze {
-    box-sizing: content-box;
+.maze {
     margin: 30px auto;
     width: 400px;
     height: 400px;
     outline: 2px solid white;
     position: relative;
+
+    &__announcer {
+        position: absolute;
+        top: 20%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+
+    &__encounter {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+
+
+.player {
+    width: 30px;
+    height: 30px;
+    background-color: blue;
+    position: absolute;
+}
+
+.game {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+
+    * {
+        flex-grow: 1;
+    }
+    
+
+    &__input {
+        height: 35px;
+        width: 100%;
+        max-width: 400px;
+        text-align: center;
+        font-size: 24px;
+    }
+
+    &__main {
+    }
+
+    &__interface {
+        flex: 1;
+    }
+
+    &__stats {
+        flex: 1;
+    }
 }
 
 .doors {
@@ -174,41 +226,63 @@ button {
     }
 }
 
-
-.player {
-    width: 30px;
-    height: 30px;
-    background-color: blue;
+.hero {
     position: absolute;
-}
+    transition: all 1s ease-in-out;
 
-.game {
-    padding: 20px;
-    display: flex;
-    justify-content: space-between;
-
-    * {
-        flex-grow: 1;
-    }
-    
-
-    &__input {
-        height: 35px;
-        width: 100%;
-        max-width: 400px;
-        text-align: center;
-        font-size: 24px;
-    }
-
-    &__main {
+    &.from-right {
+        right: -15%;
+        top: 42%;
+        animation: moveFromRight 1s ease-in-out forwards;
         
+        --end-left: initial;
+        --end-top: 42%;
+        --end-right: 10%;
+        --end-bottom: initial;
+
+        @keyframes moveFromRight {
+            0% {
+                right: -15%;
+                top: 42%;
+            }
+            100% {
+                right: 10%;
+                top: 42%;
+            }
+        }
     }
 
-    &__interface {
-        flex: 1;
+    &.from-left {
+        left: -15%;
+        top: 42%;
+        animation: moveFromLeft 1s ease-in-out forwards;
+        
+        --end-left: 10%;
+        --end-top: 42%;
+        --end-right: initial;
+        --end-bottom: initial;
+
+        @keyframes moveFromLeft {
+            0% {
+                left: -15%;
+                top: 42%;
+            }
+            100% {
+                left: 10%;
+                top: 42%;
+            }
+        }
     }
 
-    &__stats {
-        flex: 1;
+    &.to-centre {
+        animation: moveToCentre 1s ease-in-out forwards;
+
+        @keyframes moveToCentre {
+            100% {
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
     }
 }
