@@ -48,9 +48,6 @@ function initializeMaze(data) {
     mazeSize = data.mazeSize;
     maze = data.rooms;
     exit = getExitCoordinates(data);
-    console.log(maze);
-    console.log(mazeSize);
-    console.log(exit);
 
     // Further maze initializations like marking rooms as unvisited can go here
     for (let i = 0; i < mazeSize; i++) {
@@ -67,7 +64,7 @@ function initializeMaze(data) {
 
 function startGame() {
     // Inform the player they can now start
-    console.log("Type 'start' to begin your adventure!");
+    announce("Type 'start' to begin your adventure!");
 }
 
 function handleUserInput(input) {
@@ -75,21 +72,21 @@ function handleUserInput(input) {
     const encounterType = currentRoom.encounter;
 
     if (input === "start") {
-        console.log("You find yourself in a mysterious room. Which direction will you go? Type 'north', 'south', 'east', or 'west' to move.");
+        announce("You find yourself in a mysterious room. Which direction will you go? Type 'north', 'south', 'east', or 'west' to move.");
         updateMazeVisualization();
     } else if (directions.includes(input)) {
         movePlayer(input);
     } else if (input === "punch" && encounterType && encounterType.includes("troll")) {
-        console.log("You punched the troll! It's gone now.");
+        announce("You punched the troll! It's gone now.");
         currentRoom.encounter = null; // Remove the troll from the room
         displayEncounter(currentRoom);
     } else if (input === "pick up" && encounterType && (encounterType === "gold" || encounterType === "emerald" || encounterType === "diamond")) {
-        console.log(`You picked up the ${encounterType}!`);
+        announce(`You picked up the ${encounterType}!`);
         score += 10;  // for example, you can adjust score increments as you like
         currentRoom.encounter = null; // Remove the item from the room
         displayEncounter(currentRoom);
     } else {
-        console.log("Unknown command. Type 'north', 'south', 'east', or 'west' to move. If there's a troll, type 'punch' to fight it. If there's an item, type 'pick up' to collect it.");
+        announce("Unknown command. Type 'north', 'south', 'east', or 'west' to move. If there's a troll, type 'punch' to fight it. If there's an item, type 'pick up' to collect it.");
     }
 }
 
@@ -117,7 +114,7 @@ function movePlayer(direction) {
         playerPosition.y = newY;
         enterRoom();
     } else {
-        console.log("You can't go that way!");
+        announce("You can't go that way!");
     }
 }
 
@@ -149,13 +146,13 @@ function enterRoom() {
 
         // Then check if the player found the exit
         if (currentRoom.encounter === "exit") {
-            console.log("Congratulations! You found the exit!");
+            announce("Congratulations! You found the exit!");
             // End the game or restart, etc.
         } else {
-            console.log("You've entered a new room. Which direction will you go next?");
+            announce("You've entered a new room. Which direction will you go next?");
         }
     } else {
-        console.log("You've been in this room before. Choose another direction to explore.");
+        announce("You've been in this room before. Choose another direction to explore.");
         updateMazeVisualization();  // Update the visual representation of the maze
     }
 
@@ -216,3 +213,8 @@ function getExitCoordinates(data) {
     }
     return null; // This will return null if no exit is found, but in a well-designed game, there should always be an exit.
 }
+
+function announce(message) {
+    $('#announcer').text(message);
+}
+
