@@ -17,6 +17,7 @@ const roomEncounter = {
     gold: '<img src="./dist/assets/items/gold.png" alt="Gold">',
     emerald: '<img src="./dist/assets/items/emerald.png" alt="Emerald">',
     diamond: '<img src="./dist/assets/items/diamond.png" alt="Diamond">',
+    exit: '<img src="./dist/assets/exit.png" alt="Exit">'
 }
 
 $(document).ready(function () {
@@ -46,7 +47,7 @@ $(document).ready(function () {
 function initializeMaze(data) {
     mazeSize = data.mazeSize;
     maze = data.rooms;
-    exit = data.exit;
+    exit = getExitCoordinates(data);
     console.log(maze);
     console.log(mazeSize);
     console.log(exit);
@@ -136,26 +137,29 @@ function updateMazeVisualization() {
 }
 
 function enterRoom() {
+    const currentRoom = maze[playerPosition.y][playerPosition.x]; // Move this line to the top
+
     // Check if this room has been visited before
-    if (!maze[playerPosition.y][playerPosition.x].visited) {
-        maze[playerPosition.y][playerPosition.x].visited = true;
+    if (!currentRoom.visited) {
+        currentRoom.visited = true;
         // Handle encounters, items, etc. here
 
-        // Check if the player found the exit
-        if (playerPosition.x === exit.x && playerPosition.y === exit.y) {
+        // Update the visual representation of the maze first
+        updateMazeVisualization();
+
+        // Then check if the player found the exit
+        if (currentRoom.encounter === "exit") {
             console.log("Congratulations! You found the exit!");
             // End the game or restart, etc.
         } else {
             console.log("You've entered a new room. Which direction will you go next?");
-            updateMazeVisualization();  // Update the visual representation of the maze
         }
     } else {
         console.log("You've been in this room before. Choose another direction to explore.");
         updateMazeVisualization();  // Update the visual representation of the maze
     }
-    renderMazeInConsole();
 
-    const currentRoom = maze[playerPosition.y][playerPosition.x];
+    renderMazeInConsole();
     displayEncounter(currentRoom);
 }
 
@@ -200,4 +204,15 @@ function displayEncounter(room) {
     if (encounterType && roomEncounter[encounterType]) {
         $("#encounter").append(roomEncounter[encounterType]);
     }
+}
+
+function getExitCoordinates(data) {
+    for (let i = 0; i < data.mazeSize; i++) {
+        for (let j = 0; j < data.mazeSize; j++) {
+            if (data.rooms[i][j].encounter === "exit") {
+                return { x: j, y: i };
+            }
+        }
+    }
+    return null; // This will return null if no exit is found, but in a well-designed game, there should always be an exit.
 }
