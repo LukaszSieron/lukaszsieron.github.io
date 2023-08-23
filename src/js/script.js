@@ -108,11 +108,14 @@ function movePlayer(direction) {
             break;
     }
 
-    // Check if the move is valid
     if (newX >= 0 && newY >= 0 && newX < mazeSize && newY < mazeSize && maze[playerPosition.y][playerPosition.x].doors[direction]) {
-        playerPosition.x = newX;
-        playerPosition.y = newY;
-        enterRoom();
+        leaveRoomInDirection(direction);  // Play the leaving animation
+
+        setTimeout(function () {
+            playerPosition.x = newX;
+            playerPosition.y = newY;
+            enterRoomFromDirection(direction);
+        }, 1000);
     } else {
         announce("You can't go that way!");
     }
@@ -134,26 +137,27 @@ function updateMazeVisualization() {
 }
 
 function enterRoom() {
-    const currentRoom = maze[playerPosition.y][playerPosition.x]; // Move this line to the top
+    const currentRoom = maze[playerPosition.y][playerPosition.x];
 
-    // Check if this room has been visited before
     if (!currentRoom.visited) {
         currentRoom.visited = true;
-        // Handle encounters, items, etc. here
-
-        // Update the visual representation of the maze first
         updateMazeVisualization();
 
-        // Then check if the player found the exit
         if (currentRoom.encounter === "exit") {
             announce("Congratulations! You found the exit!");
-            // End the game or restart, etc.
         } else {
-            announce("You've entered a new room. Which direction will you go next?");
+            // Handle encounters here
+            if (currentRoom.encounter && currentRoom.encounter.includes("troll")) {
+                announce("You've encountered a troll! Type 'punch' to fight it.");
+            } else if (currentRoom.encounter && (currentRoom.encounter === "gold" || currentRoom.encounter === "emerald" || currentRoom.encounter === "diamond")) {
+                announce(`You see a ${currentRoom.encounter}! Type 'pick up' to collect it.`);
+            } else {
+                announce("You've entered a new room. Which direction will you go next?");
+            }
         }
     } else {
         announce("You've been in this room before. Choose another direction to explore.");
-        updateMazeVisualization();  // Update the visual representation of the maze
+        updateMazeVisualization();
     }
 
     renderMazeInConsole();
@@ -218,3 +222,42 @@ function announce(message) {
     $('#announcer').text(message);
 }
 
+function enterRoomFromDirection(direction) {
+    let animationName = '';
+    switch (direction) {
+        case "north":
+            animationName = 'arriveFromSouth';
+            break;
+        case "south":
+            animationName = 'arriveFromNorth';
+            break;
+        case "east":
+            animationName = 'arriveFromWest';
+            break;
+        case "west":
+            animationName = 'arriveFromEast';
+            break;
+    }
+
+    $('.hero').css('animation', `${animationName} 1s forwards`);
+    enterRoom();
+}
+
+function leaveRoomInDirection(direction) {
+    let animationName = '';
+    switch (direction) {
+        case "north":
+            animationName = 'leaveToNorth';
+            break;
+        case "south":
+            animationName = 'leaveToSouth';
+            break;
+        case "east":
+            animationName = 'leaveToEast';
+            break;
+        case "west":
+            animationName = 'leaveToWest';
+            break;
+    }
+    $('.hero').css('animation', `${animationName} 1s forwards`);
+}

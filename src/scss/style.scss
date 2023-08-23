@@ -65,6 +65,8 @@ button {
         max-width: 400px;
         text-align: center;
         font-size: 24px;
+
+        position: relative;
     }
 
     &__main {
@@ -228,61 +230,72 @@ button {
 
 .hero {
     position: absolute;
-    transition: all 1s ease-in-out;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition-property: top, left;
+    transition-duration: 1s;
+    transition-timing-function: ease-in-out;
 
-    &.from-right {
-        right: -15%;
-        top: 42%;
-        animation: moveFromRight 1s ease-in-out forwards;
-        
-        --end-left: initial;
-        --end-top: 42%;
-        --end-right: 10%;
-        --end-bottom: initial;
+}
 
-        @keyframes moveFromRight {
-            0% {
-                right: -15%;
-                top: 42%;
-            }
-            100% {
-                right: 10%;
-                top: 42%;
-            }
-        }
+@keyframes arriveFromNorth {
+    0% { top: 0%; left: 50%; }
+    100% { top: 50%; left: 50%; }
+}
+@keyframes arriveFromSouth {
+    0% { top: 100%; left: 50%; }
+    100% { top: 50%; left: 50%; }
+}
+@keyframes arriveFromEast {
+    0% { left: 100%; top: 50%; }
+    100% { left: 50%; top: 50%; }
+}
+@keyframes arriveFromWest {
+    0% { left: 0%; top: 50%; }
+    100% { left: 50%; top: 50%; }
+}
+
+@keyframes leaveToNorth {
+    from {
+        top: 50%;
+        left: 50%;
     }
-
-    &.from-left {
-        left: -15%;
-        top: 42%;
-        animation: moveFromLeft 1s ease-in-out forwards;
-        
-        --end-left: 10%;
-        --end-top: 42%;
-        --end-right: initial;
-        --end-bottom: initial;
-
-        @keyframes moveFromLeft {
-            0% {
-                left: -15%;
-                top: 42%;
-            }
-            100% {
-                left: 10%;
-                top: 42%;
-            }
-        }
+    to {
+        top: -10%;
+        left: 50%;
     }
+}
 
-    &.to-centre {
-        animation: moveToCentre 1s ease-in-out forwards;
+@keyframes leaveToSouth {
+    from {
+        top: 50%;
+        left: 50%;
+    }
+    to {
+        top: 110%;
+        left: 50%;
+    }
+}
 
-        @keyframes moveToCentre {
-            100% {
-                left: 50%;
-                top: 50%;
-                transform: translate(-50%, -50%);
-            }
-        }
+@keyframes leaveToEast {
+    from {
+        top: 50%;
+        left: 50%;
+    }
+    to {
+        top: 50%;
+        left: 110%;
+    }
+}
+
+@keyframes leaveToWest {
+    from {
+        top: 50%;
+        left: 50%;
+    }
+    to {
+        top: 50%;
+        left: -10%;
     }
 }
