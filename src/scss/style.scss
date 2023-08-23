@@ -38,6 +38,53 @@ button {
         left: 50%;
         transform: translate(-50%, -50%);
     }
+
+    &__menu-troll {
+        position: absolute;
+        animation: dance 1s ease-in-out infinite;
+        
+        &--1 {
+            top: 20%;
+            left: 15%;
+        }
+
+        &--2 {
+            top: 20%;
+            right: 0%;
+        }
+
+        &--3 {
+            bottom: 0%;
+            left: 20%;
+        }
+
+        &--4 {
+            bottom: 0%;
+            right: 0%;
+        }
+
+        @keyframes dance {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            25% { transform: translate(-50%, -50%) rotate(10deg); }
+            50% { transform: translate(-50%, -50%) rotate(0deg); }
+            75% { transform: translate(-50%, -50%) rotate(-10deg); }
+            100% { transform: translate(-50%, -50%) rotate(0deg); }
+        }
+    }
+
+    &__level-select {
+        position: absolute;
+        left: 50%;
+        bottom: 20%;
+        transform: translate(-50%, -50%);
+    }
+
+    &__level {
+        background: black;
+        color: white;
+        padding: 5px;
+        margin-top: 10px;
+    }
 }
 
 
@@ -237,6 +284,57 @@ button {
     transition-duration: 1s;
     transition-timing-function: ease-in-out;
 
+    // all the animations variations
+    &.arriveFromNorth {
+        animation: arriveFromNorth 1s ease-in-out forwards;
+    }
+    &.arriveFromSouth {
+        animation: arriveFromSouth 1s ease-in-out forwards;
+    }
+    &.arriveFromEast {
+        animation: arriveFromEast  1s ease-in-out forwards;
+    }
+    &.arriveFromWest {
+        animation: arriveFromWest  1s ease-in-out forwards;
+    }
+    &.leaveToNorth {
+        animation: leaveToNorth 1s ease-in-out forwards;
+    }
+    &.leaveToSouth {
+        animation: leaveToSouth 1s ease-in-out forwards;
+    }
+    &.leaveToEast {
+        animation: leaveToEast 1s ease-in-out forwards;
+    }
+    &.leaveToWest {
+        animation: leaveToWest 1s ease-in-out forwards;
+    }
+    &.fromNorthEncounter {
+        animation: arriveFromNorthEncounter 1s ease-in-out forwards;
+    }
+    &.fromSouthEncounter {
+        animation: arriveFromSouthEncounter 1s ease-in-out forwards;
+    }
+    &.fromEastEncounter {
+        animation: arriveFromEastEncounter 1s ease-in-out forwards;
+    }
+    &.fromWestEncounter {
+        animation: arriveFromWestEncounter 1s ease-in-out forwards;
+    }
+    &.toCenterFromNorth {
+        animation: toCenterFromNorth 1s ease-in-out forwards;
+    }
+    &.toCenterFromSouth {
+        animation: toCenterFromSouth 1s ease-in-out forwards;
+    }
+    &.toCenterFromEast {
+        animation: toCenterFromEast 1s ease-in-out forwards;
+    }
+    &.toCenterFromWest {
+        animation: toCenterFromWest 1s ease-in-out forwards;
+    }
+
+
 }
 
 @keyframes arriveFromNorth {
@@ -298,4 +396,44 @@ button {
         top: 50%;
         left: -10%;
     }
+}
+
+@keyframes arriveFromNorthEncounter {
+    0% { top: -10%; left: 50%; }
+    100% { top: 20%; left: 50%; }
+}
+
+@keyframes arriveFromSouthEncounter {
+    0% { top: 110%; left: 50%; }
+    100% { top: 80%; left: 50%; }
+}
+
+@keyframes arriveFromEastEncounter {
+    0% { top: 50%; left: 110%; }
+    100% { top: 50%; left: 80%; }
+}
+
+@keyframes arriveFromWestEncounter {
+    0% { top: 50%; left: -10%; }
+    100% { top: 50%; left: 20%; }
+}
+
+@keyframes toCenterFromNorth {
+    0% { top: 20%; left: 50%; }
+    100% { top: 50%; left: 50%; }
+}
+
+@keyframes toCenterFromSouth {
+    0% { top: 80%; left: 50%; }
+    100% { top: 50%; left: 50%; }
+}
+
+@keyframes toCenterFromEast {
+    0% { top: 50%; left: 80%; }
+    100% { top: 50%; left: 50%; }
+}
+
+@keyframes toCenterFromWest {
+    0% { top: 50%; left: 20%; }
+    100% { top: 50%; left: 50%; }
 }

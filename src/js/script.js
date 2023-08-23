@@ -33,7 +33,6 @@ $(document).ready(function () {
                     let input = $(this).val().toLowerCase();
                     handleUserInput(input);
                     // clear the input field
-
                     $(this).val("");
                 }
             });
@@ -60,11 +59,6 @@ function initializeMaze(data) {
         playerPosition.x = getRandomInt(mazeSize);
         playerPosition.y = getRandomInt(mazeSize);
     } while (getDistance(playerPosition, exit) < 3);
-}
-
-function startGame() {
-    // Inform the player they can now start
-    announce("Type 'start' to begin your adventure!");
 }
 
 function handleUserInput(input) {
@@ -223,23 +217,34 @@ function announce(message) {
 }
 
 function enterRoomFromDirection(direction) {
+    const currentRoom = maze[playerPosition.y][playerPosition.x];
+    let isEncounterInThatRoom = currentRoom.encounter !== null;
     let animationName = '';
+
     switch (direction) {
         case "north":
-            animationName = 'arriveFromSouth';
+            animationName = isEncounterInThatRoom ? 'fromSouthEncounter' : 'arriveFromSouth';
             break;
         case "south":
-            animationName = 'arriveFromNorth';
+            animationName = isEncounterInThatRoom ? 'fromNorthEncounter' : 'arriveFromNorth';
             break;
         case "east":
-            animationName = 'arriveFromWest';
+            animationName = isEncounterInThatRoom ? 'fromWestEncounter' : 'arriveFromWest';
             break;
         case "west":
-            animationName = 'arriveFromEast';
+            animationName = isEncounterInThatRoom ? 'fromEastEncounter' : 'arriveFromEast';
             break;
     }
 
-    $('.hero').css('animation', `${animationName} 1s forwards`);
+    $('.hero').addClass(animationName);
+    // Wait for the animation to finish
+    setTimeout(function () {
+        // if it's an encounter, dont remove the animation class
+        if (!isEncounterInThatRoom) {
+            $('.hero').removeClass(animationName);
+            moveToCenter();
+        }
+    }, 1000);
     enterRoom();
 }
 
@@ -259,5 +264,28 @@ function leaveRoomInDirection(direction) {
             animationName = 'leaveToWest';
             break;
     }
-    $('.hero').css('animation', `${animationName} 1s forwards`);
+    $('.hero').addClass(animationName);
+    // Wait for the animation to finish
+    setTimeout(function () {
+        $('.hero').removeClass(animationName);
+    }, 1000);
+
+}
+
+function moveToCenter() {
+    const hero = $('.hero');
+    const directionMap = {
+        'fromNorthEncounter': 'toCenterFromNorth',
+        'fromSouthEncounter': 'toCenterFromSouth',
+        'fromEastEncounter': 'toCenterFromEast',
+        'fromWestEncounter': 'toCenterFromWest',
+    };
+
+    for (let fromClass in directionMap) {
+        if (hero.hasClass(fromClass)) {
+            hero.addClass(directionMap[fromClass])
+                .removeClass(fromClass);
+            break;
+        }
+    }
 }
