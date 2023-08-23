@@ -1,7 +1,16 @@
 // Global variables
 let playerPosition = { x: 0, y: 0 };
 let score = 0;
+let duringGame = false;
+let duringEncounter = false;
+let question = false;
 const directions = ["north", "south", "east", "west"];
+
+let levelSelectWrapper = $('.maze__level-select');
+let levelSelect = $('#level');
+let menuTrolls = $('.maze__menu-troll');
+let menuHeader = $('.menu__heading');
+let level
 
 const doors = {
     north: '<span class="doors doors--north"></span>',
@@ -20,28 +29,38 @@ const roomEncounter = {
     exit: '<img src="./dist/assets/exit.png" alt="Exit">'
 }
 
-$(document).ready(function () {
+// User input handling
+$("#userInput").keypress(function (e) {
+    if (e.which === 13) { // Enter key pressed
+        let input = $(this).val().toLowerCase();
+        handleUserInput(input);
+        // clear the input field
+        $(this).val("");
+    }
+});
+
+function loadMaze() {
+    let level = levelSelect.val();
+
     $.ajax({
-        url: './maze-configs/maze-small.json',
+        url: './maze-configs/' + level + '.json',
         type: 'GET',
         dataType: 'json',
         success: function (data) {
             initializeMaze(data);
-            // Wait for user input
-            $("#userInput").keypress(function (e) {
-                if (e.which === 13) { // Enter key pressed
-                    let input = $(this).val().toLowerCase();
-                    handleUserInput(input);
-                    // clear the input field
-                    $(this).val("");
-                }
-            });
+            updateMazeVisualization();
         },
         error: function () {
             alert('Failed to load maze.');
         }
     });
-});
+}
+
+function hideMenuItems() {
+    menuTrolls.hide();
+    levelSelectWrapper.hide();
+    menuHeader.hide();
+}
 
 function initializeMaze(data) {
     mazeSize = data.mazeSize;
@@ -62,27 +81,35 @@ function initializeMaze(data) {
 }
 
 function handleUserInput(input) {
-    const currentRoom = maze[playerPosition.y][playerPosition.x];
-    const encounterType = currentRoom.encounter;
-
-    if (input === "start") {
-        announce("You find yourself in a mysterious room. Which direction will you go? Type 'north', 'south', 'east', or 'west' to move.");
-        updateMazeVisualization();
+    if (input === "start" && !duringGame) {
+        // announce("You find yourself in a mysterious room. Which direction will you go? Type 'north', 'south', 'east', or 'west' to move.");
+        duringGame = true;
+        hideMenuItems();
+        loadMaze();
+    } else if (input === "start" && duringGame) {
+        announce("Do you want to return to main menu? Type 'yes' or 'no'.");
+        question = true;
     } else if (directions.includes(input)) {
         movePlayer(input);
-    } else if (input === "punch" && encounterType && encounterType.includes("troll")) {
-        announce("You punched the troll! It's gone now.");
-        currentRoom.encounter = null; // Remove the troll from the room
-        displayEncounter(currentRoom);
-    } else if (input === "pick up" && encounterType && (encounterType === "gold" || encounterType === "emerald" || encounterType === "diamond")) {
-        announce(`You picked up the ${encounterType}!`);
-        score += 10;  // for example, you can adjust score increments as you like
-        currentRoom.encounter = null; // Remove the item from the room
-        displayEncounter(currentRoom);
+        // handleEncounter();
     } else {
-        announce("Unknown command. Type 'north', 'south', 'east', or 'west' to move. If there's a troll, type 'punch' to fight it. If there's an item, type 'pick up' to collect it.");
+        announce("Unknown command. Type 'help' for more instructions.");
     }
 }
+
+// Encounter code to be refactored later
+// const currentRoom = maze[playerPosition.y][playerPosition.x];
+// const encounterType = currentRoom.encounter;
+// else if (input === "punch" && encounterType && encounterType.includes("troll")) {
+//     announce("You punched the troll! It's gone now.");
+//     currentRoom.encounter = null; // Remove the troll from the room
+//     displayEncounter(currentRoom);
+// } else if (input === "pick up" && encounterType && (encounterType === "gold" || encounterType === "emerald" || encounterType === "diamond")) {
+//     announce(`You picked up the ${encounterType}!`);
+//     score += 10;  // for example, you can adjust score increments as you like
+//     currentRoom.encounter = null; // Remove the item from the room
+//     displayEncounter(currentRoom);
+// }
 
 function movePlayer(direction) {
     let newX = playerPosition.x;
