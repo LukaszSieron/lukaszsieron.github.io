@@ -86,8 +86,23 @@ function handleUserInput(input) {
         loadMaze();
         announce("You are in a maze. Try to find the exit. Type 'help' for more instructions.");
     } else if (input === "start" && duringGame) {
-        announce("Do you want to return to main menu? Type 'yes' or 'no'.");
+        announce("Do you want to return to the main menu? Type 'yes' or 'no'.");
         question = true;
+    } else if (question) {
+        if (input === "yes") {
+            // Reset everything
+            duringGame = false;
+            duringEncounter = false;
+            question = false;
+            resetGame();
+            announce("Game has been reset. Type 'start' to begin again.");
+        } else if (input === "no") {
+            // Continue game
+            question = false;
+            announce("Continue your journey!");
+        } else {
+            encounterAnnounce("Please answer with 'yes' or 'no'.");
+        }
     } else if (directions.includes(input)) {
         // Check if the player is during an encounter. If so, notify them and prevent movement.
         if (duringEncounter) {
@@ -338,4 +353,22 @@ function closeDoors() {
 
 function openDoors() {
     $('.doors').removeClass('closed');
+}
+
+function resetGame() {
+    // Revert all hidden menu items
+    menuTrolls.show();
+    levelSelectWrapper.show();
+    menuHeader.show();
+
+    // Remove other classes from the hero element apart from .hero
+    $('.hero').attr('class', 'hero');
+
+    // Remove all images from the #encounter container
+    $('#encounter').empty();
+
+    // Unload Maze
+    maze = null;
+    playerPosition = { x: 0, y: 0 };
+    score = 0;
 }
