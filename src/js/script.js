@@ -4,6 +4,10 @@ let score = 0;
 let duringGame = false;
 let duringEncounter = false;
 let question = false;
+
+// Needed to store the previous announcement when the player is asked a question
+let previousAnnouncement = null;
+
 const directions = ["north", "south", "east", "west"];
 
 let levelSelectWrapper = $('.maze__level-select');
@@ -80,12 +84,14 @@ function initializeMaze(data) {
 }
 
 function handleUserInput(input) {
+
     if (input === "start" && !duringGame) {
         duringGame = true;
         hideMenuItems();
         loadMaze();
         announce("You are in a maze. Try to find the exit. Type 'help' for more instructions.");
     } else if (input === "start" && duringGame) {
+        previousAnnouncement = $('#announcer').text();
         announce("Do you want to return to the main menu? Type 'yes' or 'no'.");
         question = true;
     } else if (question) {
@@ -99,7 +105,7 @@ function handleUserInput(input) {
         } else if (input === "no") {
             // Continue game
             question = false;
-            announce("Continue your journey!");
+            announce(previousAnnouncement);
         } else {
             encounterAnnounce("Please answer with 'yes' or 'no'.");
         }
@@ -273,7 +279,6 @@ function handleEncounter(userInput = null) {
             case 'gold':
                 score += 10; // Increment score as you deem fit
                 break;
-            // For trolls or other enemies, you might decrease health or handle other game mechanics
         }
 
         maze[y][x].encounter = null;  // Remove the encounter from the room
