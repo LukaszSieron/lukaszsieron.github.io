@@ -20,8 +20,8 @@ button {
 
 .maze {
     margin: 30px auto;
-    width: 400px;
-    height: 400px;
+    width: 600px;
+    height: 600px;
     outline: 2px solid white;
     position: relative;
 
@@ -73,6 +73,8 @@ button {
     }
 
     &__level-select {
+        display: flex;
+        flex-direction: column;
         position: absolute;
         left: 50%;
         bottom: 20%;

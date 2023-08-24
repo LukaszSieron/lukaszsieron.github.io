@@ -10,7 +10,6 @@ let levelSelectWrapper = $('.maze__level-select');
 let levelSelect = $('#level');
 let menuTrolls = $('.maze__menu-troll');
 let menuHeader = $('.menu__heading');
-let level
 
 const doors = {
     north: '<span class="doors doors--north"></span>',
@@ -82,7 +81,6 @@ function initializeMaze(data) {
 
 function handleUserInput(input) {
     if (input === "start" && !duringGame) {
-        // announce("You find yourself in a mysterious room. Which direction will you go? Type 'north', 'south', 'east', or 'west' to move.");
         duringGame = true;
         hideMenuItems();
         loadMaze();
@@ -91,47 +89,53 @@ function handleUserInput(input) {
         question = true;
     } else if (directions.includes(input)) {
         movePlayer(input);
-        // handleEncounter();
+    } else if (duringEncounter) {
+        // Handle the encounter input
+        handleEncounterInput(input);
     } else {
         announce("Unknown command. Type 'help' for more instructions.");
     }
 }
 
-// Encounter code to be refactored later
-// const currentRoom = maze[playerPosition.y][playerPosition.x];
-// const encounterType = currentRoom.encounter;
-// else if (input === "punch" && encounterType && encounterType.includes("troll")) {
-//     announce("You punched the troll! It's gone now.");
-//     currentRoom.encounter = null; // Remove the troll from the room
-//     displayEncounter(currentRoom);
-// } else if (input === "pick up" && encounterType && (encounterType === "gold" || encounterType === "emerald" || encounterType === "diamond")) {
-//     announce(`You picked up the ${encounterType}!`);
-//     score += 10;  // for example, you can adjust score increments as you like
-//     currentRoom.encounter = null; // Remove the item from the room
-//     displayEncounter(currentRoom);
-// }
+function handleEncounterInput(input) {
+    const currentRoom = maze[playerPosition.y][playerPosition.x];
+    const encounterType = currentRoom.encounter;
+
+    // Use an object to map user input to a particular action for an encounter type
+    const encounterActions = {
+        'white_troll': { action: 'punch', message: 'You punched the white troll! It ran away.' },
+        'green_troll': { action: 'kick', message: 'You kicked the green troll! Its gone now.' },
+        'yellow_troll': { action: 'throw', message: 'You threw a stone at the yellow troll! Its scared away.' },
+        'gold': { action: 'collect', message: `You collected gold!` },
+        'emerald': { action: 'grab', message: `You grabbed an emerald!` },
+        'diamond': { action: 'pick', message: `You picked up a diamond!` },
+        'exit': { action: 'exit', message: `You've found the exit! Congratulations.` }
+    };
+
+    if (encounterActions[encounterType] && input === encounterActions[encounterType].action) {
+        announce(encounterActions[encounterType].message);
+        currentRoom.encounter = null; // Remove the encounter
+        score += 10; // Increment score
+        duringEncounter = false;
+        moveToCenter();
+    } else {
+        announce("Wrong action! Try again.");
+    }
+}
 
 function movePlayer(direction) {
     let newX = playerPosition.x;
     let newY = playerPosition.y;
+
     switch (direction) {
-        case "north":
-            newY--;
-            break;
-        case "south":
-            newY++;
-            break;
-        case "east":
-            newX++;
-            break;
-        case "west":
-            newX--;
-            break;
+        case "north": newY--; break;
+        case "south": newY++; break;
+        case "east": newX++; break;
+        case "west": newX--; break;
     }
 
-    if (newX >= 0 && newY >= 0 && newX < mazeSize && newY < mazeSize && maze[playerPosition.y][playerPosition.x].doors[direction]) {
-        leaveRoomInDirection(direction);  // Play the leaving animation
-
+    if (canMoveTo(newX, newY, direction)) {
+        leaveRoomInDirection(direction);
         setTimeout(function () {
             playerPosition.x = newX;
             playerPosition.y = newY;
@@ -141,6 +145,11 @@ function movePlayer(direction) {
         announce("You can't go that way!");
     }
 }
+
+function canMoveTo(x, y, direction) {
+    return x >= 0 && y >= 0 && x < mazeSize && y < mazeSize && maze[playerPosition.y][playerPosition.x].doors[direction];
+}
+
 
 function updateMazeVisualization() {
     // Clear any existing door elements from the previous room
@@ -160,29 +169,96 @@ function updateMazeVisualization() {
 function enterRoom() {
     const currentRoom = maze[playerPosition.y][playerPosition.x];
 
-    if (!currentRoom.visited) {
+    if (!currentRoom.visited && currentRoom.encounter !== null) {
         currentRoom.visited = true;
         updateMazeVisualization();
 
         if (currentRoom.encounter === "exit") {
             announce("Congratulations! You found the exit!");
+            // End game or progress to next level
         } else {
-            // Handle encounters here
-            if (currentRoom.encounter && currentRoom.encounter.includes("troll")) {
-                announce("You've encountered a troll! Type 'punch' to fight it.");
-            } else if (currentRoom.encounter && (currentRoom.encounter === "gold" || currentRoom.encounter === "emerald" || currentRoom.encounter === "diamond")) {
-                announce(`You see a ${currentRoom.encounter}! Type 'pick up' to collect it.`);
-            } else {
-                announce("You've entered a new room. Which direction will you go next?");
-            }
+            duringEncounter = true;
+            handleEncounter();
         }
     } else {
-        announce("You've been in this room before. Choose another direction to explore.");
+        announce("Nothing in this room");
         updateMazeVisualization();
     }
 
     renderMazeInConsole();
     displayEncounter(currentRoom);
+}
+
+function handleEncounter(userInput = null) {
+    const x = playerPosition.x;
+    const y = playerPosition.y;
+    const encounter = maze[y][x].encounter;
+
+    if (!encounter) {
+        announce("The room is empty. Nothing to do here.");
+        return;
+    }
+
+    let requiredAction = null;
+    let announcement = null;
+
+    switch (encounter) {
+        case 'diamond':
+            announcement = "You've found a shining diamond! Type 'pick' to pick it up!";
+            requiredAction = "pick";
+            break;
+        case 'white_troll':
+            announcement = "You spotted a white troll! Type 'punch' to defeat it!";
+            requiredAction = "punch";
+            break;
+        case 'emerald':
+            announcement = "You've found a gleaming emerald! Type 'grab' to pick it up!";
+            requiredAction = "grab";
+            break;
+        case 'green_troll':
+            announcement = "You encountered a green troll! Type 'kick' to kick it away!";
+            requiredAction = "kick";
+            break;
+        case 'yellow_troll':
+            announcement = "Beware! A yellow troll is blocking your way! Type 'throw' to throw a stone at it!";
+            requiredAction = "throw";
+            break;
+        case 'gold':
+            announcement = "Golden treasures await! Type 'collect' to collect them!";
+            requiredAction = "collect";
+            break;
+        case 'exit':
+            announcement = "You've found the exit! Type 'exit' to leave.";
+            requiredAction = "exit";
+            break;
+        default:
+            announcement = "Unknown encounter!";
+    }
+
+    // If userInput is null, it means this is the first time player has entered the room
+    if (userInput === null) {
+        announce(announcement);
+        return;
+    }
+
+    // If userInput matches the required action
+    if (userInput === requiredAction) {
+        switch (encounter) {
+            case 'diamond':
+            case 'emerald':
+            case 'gold':
+                score += 10; // Increment score as you deem fit
+                break;
+            // For trolls or other enemies, you might decrease health or handle other game mechanics
+        }
+
+        maze[y][x].encounter = null;  // Remove the encounter from the room
+        moveToCenter();               // Move hero to center of the room
+        duringEncounter = false;     // Clear the encounter flag
+        announce(`Successfully handled the ${encounter}.`); // Notify player
+    } else {
+        announce("Wrong action! Try again.");
+    }
 }
 
 function getRandomInt(max) {
@@ -315,4 +391,9 @@ function moveToCenter() {
             break;
         }
     }
+
+    // now after animation finishes after 1 sec remove the toCenter class
+    setTimeout(function () {
+        hero.removeClass('toCenterFromNorth toCenterFromSouth toCenterFromEast toCenterFromWest');
+    }, 1000);
 }
