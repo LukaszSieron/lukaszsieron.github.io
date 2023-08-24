@@ -19,12 +19,12 @@ const doors = {
 }
 
 const roomEncounter = {
-    white_troll: '<img src="./dist/assets/monsters/white-troll.png" alt="White troll">',
-    green_troll: '<img src="./dist/assets/monsters/green-troll.png" alt="Green troll">',
-    yellow_troll: '<img src="./dist/assets/monsters/yellow-troll.png" alt="Yellow troll">',
-    gold: '<img src="./dist/assets/items/gold.png" alt="Gold">',
-    emerald: '<img src="./dist/assets/items/emerald.png" alt="Emerald">',
-    diamond: '<img src="./dist/assets/items/diamond.png" alt="Diamond">',
+    white_troll: '<img class="troll white_troll" src="./dist/assets/monsters/white-troll.png" alt="White troll">',
+    green_troll: '<img class="troll green_troll" src="./dist/assets/monsters/green-troll.png" alt="Green troll">',
+    yellow_troll: '<img class="troll yellow_troll" src="./dist/assets/monsters/yellow-troll.png" alt="Yellow troll">',
+    gold: '<img class="gold" src="./dist/assets/items/gold.png" alt="Gold">',
+    emerald: '<img class="emerald" src="./dist/assets/items/emerald.png" alt="Emerald">',
+    diamond: '<img class="diamond" src="./dist/assets/items/diamond.png" alt="Diamond">',
     exit: '<img src="./dist/assets/exit.png" alt="Exit">'
 }
 
@@ -84,11 +84,17 @@ function handleUserInput(input) {
         duringGame = true;
         hideMenuItems();
         loadMaze();
+        announce("You are in a maze. Try to find the exit. Type 'help' for more instructions.");
     } else if (input === "start" && duringGame) {
         announce("Do you want to return to main menu? Type 'yes' or 'no'.");
         question = true;
     } else if (directions.includes(input)) {
-        movePlayer(input);
+        // Check if the player is during an encounter. If so, notify them and prevent movement.
+        if (duringEncounter) {
+            encounterAnnounce("You can't leave until you've dealt with the encounter!");
+        } else {
+            movePlayer(input);
+        }
     } else if (duringEncounter) {
         // Handle the encounter input
         handleEncounterInput(input);
@@ -100,6 +106,7 @@ function handleUserInput(input) {
 function handleEncounterInput(input) {
     const currentRoom = maze[playerPosition.y][playerPosition.x];
     const encounterType = currentRoom.encounter;
+    closeDoors();
 
     // Use an object to map user input to a particular action for an encounter type
     const encounterActions = {
@@ -114,12 +121,14 @@ function handleEncounterInput(input) {
 
     if (encounterActions[encounterType] && input === encounterActions[encounterType].action) {
         announce(encounterActions[encounterType].message);
+        encounterAnnounce("");
         currentRoom.encounter = null; // Remove the encounter
         score += 10; // Increment score
         duringEncounter = false;
         moveToCenter();
+        openDoors();
     } else {
-        announce("Wrong action! Try again.");
+        encounterAnnounce("Wrong action! Try again.");
     }
 }
 
@@ -319,81 +328,14 @@ function announce(message) {
     $('#announcer').text(message);
 }
 
-function enterRoomFromDirection(direction) {
-    const currentRoom = maze[playerPosition.y][playerPosition.x];
-    let isEncounterInThatRoom = currentRoom.encounter !== null;
-    let animationName = '';
-
-    switch (direction) {
-        case "north":
-            animationName = isEncounterInThatRoom ? 'fromSouthEncounter' : 'arriveFromSouth';
-            break;
-        case "south":
-            animationName = isEncounterInThatRoom ? 'fromNorthEncounter' : 'arriveFromNorth';
-            break;
-        case "east":
-            animationName = isEncounterInThatRoom ? 'fromWestEncounter' : 'arriveFromWest';
-            break;
-        case "west":
-            animationName = isEncounterInThatRoom ? 'fromEastEncounter' : 'arriveFromEast';
-            break;
-    }
-
-    $('.hero').addClass(animationName);
-    // Wait for the animation to finish
-    setTimeout(function () {
-        // if it's an encounter, dont remove the animation class
-        if (!isEncounterInThatRoom) {
-            $('.hero').removeClass(animationName);
-            moveToCenter();
-        }
-    }, 1000);
-    enterRoom();
+function encounterAnnounce(message) {
+    $('#encounterAnnouncer').text(message);
 }
 
-function leaveRoomInDirection(direction) {
-    let animationName = '';
-    switch (direction) {
-        case "north":
-            animationName = 'leaveToNorth';
-            break;
-        case "south":
-            animationName = 'leaveToSouth';
-            break;
-        case "east":
-            animationName = 'leaveToEast';
-            break;
-        case "west":
-            animationName = 'leaveToWest';
-            break;
-    }
-    $('.hero').addClass(animationName);
-    // Wait for the animation to finish
-    setTimeout(function () {
-        $('.hero').removeClass(animationName);
-    }, 1000);
-
+function closeDoors() {
+    $('.doors').addClass('closed');
 }
 
-function moveToCenter() {
-    const hero = $('.hero');
-    const directionMap = {
-        'fromNorthEncounter': 'toCenterFromNorth',
-        'fromSouthEncounter': 'toCenterFromSouth',
-        'fromEastEncounter': 'toCenterFromEast',
-        'fromWestEncounter': 'toCenterFromWest',
-    };
-
-    for (let fromClass in directionMap) {
-        if (hero.hasClass(fromClass)) {
-            hero.addClass(directionMap[fromClass])
-                .removeClass(fromClass);
-            break;
-        }
-    }
-
-    // now after animation finishes after 1 sec remove the toCenter class
-    setTimeout(function () {
-        hero.removeClass('toCenterFromNorth toCenterFromSouth toCenterFromEast toCenterFromWest');
-    }, 1000);
+function openDoors() {
+    $('.doors').removeClass('closed');
 }
