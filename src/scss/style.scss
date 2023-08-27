@@ -137,6 +137,42 @@ button {
     }
 }
 
+// The enemies and rewards 'deafeat' animations.
+.enemy {
+
+    &.defeated {
+        animation: defeated 1s ease-in forwards;
+
+        @keyframes defeated {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(0); }
+        }
+    }
+}
+
+.reward {
+
+    &.defeated {
+        animation: defeated 1s ease-in forwards;
+
+        @keyframes defeated {
+            0% { 
+                transform: scale(1);
+                opacity: 1; 
+            }
+            50% { 
+                transform: scale(1.5);
+                opacity: 0.5 
+            }
+            100% { 
+                transform: scale(2);
+                opacity: 0; 
+            }
+        }
+    }
+}
+
 .doors {
     position: absolute;
     background-color: black;

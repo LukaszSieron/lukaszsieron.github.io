@@ -1,14 +1,16 @@
 {
     "mazeSize": 3,
+    "enemies": ["white_troll", "green_troll", "yellow_troll"],
+    "treasures": ["emerald", "diamond", "gold"],
     "rooms": [
         [
-            { "doors": { "north": false, "east": true, "south": true, "west": false }, "encounter": "diamond" },
+            { "doors": { "north": false, "east": true, "south": true, "west": false }, "encounter": ["diamond"] },
             { "doors": { "north": false, "east": true, "south": true, "west": true }, "encounter": null },
-            { "doors": { "north": false, "east": false, "south": true, "west": true }, "encounter": "white_troll" }
+            { "doors": { "north": false, "east": false, "south": true, "west": true }, "encounter": ["white_troll", "green_troll"] }
         ],
         [
-            { "doors": { "north": true, "east": true, "south": true, "west": false }, "encounter": "emerald" },
-            { "doors": { "north": true, "east": true, "south": true, "west": true }, "encounter": "green_troll" },
+            { "doors": { "north": true, "east": true, "south": true, "west": false }, "encounter": ["emerald", "diamond"] },
+            { "doors": { "north": true, "east": true, "south": true, "west": true }, "encounter": ["white_troll", "green_troll", "diamond"] },
             { "doors": { "north": true, "east": false, "south": true, "west": true }, "encounter": "yellow_troll" }
         ],
         [

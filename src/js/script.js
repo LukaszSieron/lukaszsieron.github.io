@@ -23,12 +23,12 @@ const doors = {
 }
 
 const roomEncounter = {
-    white_troll: '<img class="troll white_troll" src="./dist/assets/monsters/white-troll.png" alt="White troll">',
-    green_troll: '<img class="troll green_troll" src="./dist/assets/monsters/green-troll.png" alt="Green troll">',
-    yellow_troll: '<img class="troll yellow_troll" src="./dist/assets/monsters/yellow-troll.png" alt="Yellow troll">',
-    gold: '<img class="gold" src="./dist/assets/items/gold.png" alt="Gold">',
-    emerald: '<img class="emerald" src="./dist/assets/items/emerald.png" alt="Emerald">',
-    diamond: '<img class="diamond" src="./dist/assets/items/diamond.png" alt="Diamond">',
+    white_troll: '<img class="enemy white_troll" src="./dist/assets/monsters/white-troll.png" alt="White troll">',
+    green_troll: '<img class="enemy green_troll" src="./dist/assets/monsters/green-troll.png" alt="Green troll">',
+    yellow_troll: '<img class="enemy yellow_troll" src="./dist/assets/monsters/yellow-troll.png" alt="Yellow troll">',
+    gold: '<img class="reward gold" src="./dist/assets/items/gold.png" alt="Gold">',
+    emerald: '<img class="reward emerald" src="./dist/assets/items/emerald.png" alt="Emerald">',
+    diamond: '<img class="reward diamond" src="./dist/assets/items/diamond.png" alt="Diamond">',
     exit: '<img src="./dist/assets/exit.png" alt="Exit">'
 }
 
@@ -68,6 +68,8 @@ function hideMenuItems() {
 function initializeMaze(data) {
     mazeSize = data.mazeSize;
     maze = data.rooms;
+    mazeEnemies = data.enemies;
+    mazeTreasures = data.treasures;
     exit = getExitCoordinates(data);
 
     // Further maze initializations like marking rooms as unvisited can go here
@@ -126,10 +128,16 @@ function handleUserInput(input) {
 
 function handleEncounterInput(input) {
     const currentRoom = maze[playerPosition.y][playerPosition.x];
-    const encounterType = currentRoom.encounter;
-    closeDoors();
+    let encounters = currentRoom.encounter;
 
-    // Use an object to map user input to a particular action for an encounter type
+    if (!encounters) {
+        return;
+    }
+
+    if (typeof encounters === 'string') {
+        encounters = [encounters];
+    }
+
     const encounterActions = {
         'white_troll': { action: 'punch', message: 'You punched the white troll! It ran away.' },
         'green_troll': { action: 'kick', message: 'You kicked the green troll! Its gone now.' },
@@ -140,18 +148,36 @@ function handleEncounterInput(input) {
         'exit': { action: 'exit', message: `You've found the exit! Congratulations.` }
     };
 
-    if (encounterActions[encounterType] && input === encounterActions[encounterType].action) {
-        announce(encounterActions[encounterType].message);
-        encounterAnnounce("");
-        currentRoom.encounter = null; // Remove the encounter
-        score += 10; // Increment score
-        duringEncounter = false;
-        moveToCenter();
-        openDoors();
+    const currentEncounter = encounters[0];
+
+    // Check if the given input matches the required action for the current encounter
+    if (encounterActions[currentEncounter] && input === encounterActions[currentEncounter].action) {
+        announce(encounterActions[currentEncounter].message);
+
+        // Add 'defeated' class to the next non-defeated image
+        $("#encounter").find("img:not(.defeated)").first().addClass('defeated');
+
+        encounters.shift(); // Remove the handled encounter
+
+        if (mazeTreasures.includes(currentEncounter)) {
+            score += 10; // Increment score for treasures
+        }
+
+        // If no more encounters are left in the room
+        if (encounters.length === 0) {
+            currentRoom.encounter = null;
+            duringEncounter = false;
+            moveToCenter();
+            openDoors();
+        } else {
+            // Otherwise, proceed to the next encounter in the list
+            handleEncounter();
+        }
     } else {
         encounterAnnounce("Wrong action! Try again.");
     }
 }
+
 
 function movePlayer(direction) {
     let newX = playerPosition.x;
@@ -222,71 +248,87 @@ function enterRoom() {
 function handleEncounter(userInput = null) {
     const x = playerPosition.x;
     const y = playerPosition.y;
-    const encounter = maze[y][x].encounter;
+    let encounters = maze[y][x].encounter;
 
-    if (!encounter) {
+    if (!encounters || encounters.length === 0) {
         announce("The room is empty. Nothing to do here.");
         return;
     }
 
-    let requiredAction = null;
-    let announcement = null;
-
-    switch (encounter) {
-        case 'diamond':
-            announcement = "You've found a shining diamond! Type 'pick' to pick it up!";
-            requiredAction = "pick";
-            break;
-        case 'white_troll':
-            announcement = "You spotted a white troll! Type 'punch' to defeat it!";
-            requiredAction = "punch";
-            break;
-        case 'emerald':
-            announcement = "You've found a gleaming emerald! Type 'grab' to pick it up!";
-            requiredAction = "grab";
-            break;
-        case 'green_troll':
-            announcement = "You encountered a green troll! Type 'kick' to kick it away!";
-            requiredAction = "kick";
-            break;
-        case 'yellow_troll':
-            announcement = "Beware! A yellow troll is blocking your way! Type 'throw' to throw a stone at it!";
-            requiredAction = "throw";
-            break;
-        case 'gold':
-            announcement = "Golden treasures await! Type 'collect' to collect them!";
-            requiredAction = "collect";
-            break;
-        case 'exit':
-            announcement = "You've found the exit! Type 'exit' to leave.";
-            requiredAction = "exit";
-            break;
-        default:
-            announcement = "Unknown encounter!";
+    if (typeof encounters === 'string') {
+        encounters = [encounters];
     }
 
-    // If userInput is null, it means this is the first time player has entered the room
-    if (userInput === null) {
-        announce(announcement);
-        return;
-    }
+    const enemiesInRoom = encounters.filter(item => mazeEnemies.includes(item));
+    const treasuresInRoom = encounters.filter(item => mazeTreasures.includes(item));
 
-    // If userInput matches the required action
-    if (userInput === requiredAction) {
-        switch (encounter) {
-            case 'diamond':
-            case 'emerald':
-            case 'gold':
-                score += 10; // Increment score as you deem fit
-                break;
+    // Handle enemies first
+    if (enemiesInRoom.length > 0) {
+        const enemy = enemiesInRoom[0];
+        const enemyAction = getRequiredActionForEncounter(enemy);
+
+        if (userInput === null) {
+            announce(enemyAction.announcement);
+            return;
         }
 
+        if (userInput === enemyAction.requiredAction) {
+            $(`#encounter .${enemy}`).addClass('defeated'); // Mark the enemy as defeated
+            enemiesInRoom.shift(); // Remove the defeated enemy
+        } else {
+            announce("Wrong action! Try again.");
+            return;
+        }
+    }
+
+    // Handle treasures if no more enemies left
+    if (enemiesInRoom.length === 0) {
+        if (treasuresInRoom.length > 0) {
+            const treasure = treasuresInRoom[0];
+            const treasureAction = getRequiredActionForEncounter(treasure);
+
+            if (userInput === null) {
+                announce(treasureAction.announcement);
+                return;
+            }
+
+            if (userInput === treasureAction.requiredAction) {
+                $(`#encounter .${treasure}`).addClass('defeated'); // Mark the treasure as collected
+                treasuresInRoom.shift(); // Remove the collected treasure
+                score += 10; // Increment score
+            } else {
+                announce("Wrong action! Try again.");
+                return;
+            }
+        }
+    }
+
+    if (enemiesInRoom.length === 0 && treasuresInRoom.length === 0) {
         maze[y][x].encounter = null;  // Remove the encounter from the room
         moveToCenter();               // Move hero to center of the room
         duringEncounter = false;     // Clear the encounter flag
-        announce(`Successfully handled the ${encounter}.`); // Notify player
-    } else {
-        announce("Wrong action! Try again.");
+        announce("Room cleared!");
+    }
+}
+
+function getRequiredActionForEncounter(encounter) {
+    switch (encounter) {
+        case 'diamond':
+            return { announcement: "You've found a shining diamond! Type 'pick' to pick it up!", requiredAction: "pick" };
+        case 'white_troll':
+            return { announcement: "You spotted a white troll! Type 'punch' to defeat it!", requiredAction: "punch" };
+        case 'emerald':
+            return { announcement: "You've found a gleaming emerald! Type 'grab' to pick it up!", requiredAction: "grab" };
+        case 'green_troll':
+            return { announcement: "You encountered a green troll! Type 'kick' to kick it away!", requiredAction: "kick" };
+        case 'yellow_troll':
+            return { announcement: "Beware! A yellow troll is blocking your way! Type 'throw' to throw a stone at it!", requiredAction: "throw" };
+        case 'gold':
+            return { announcement: "Golden treasures await! Type 'collect' to collect them!", requiredAction: "collect" };
+        case 'exit':
+            return { announcement: "You've found the exit! Type 'exit' to leave.", requiredAction: "exit" };
+        default:
+            return { announcement: "Unknown encounter!", requiredAction: null };
     }
 }
 
@@ -327,11 +369,31 @@ function displayEncounter(room) {
     // Clear any existing encounters from the previous room
     $('#encounter').empty();
 
-    const encounterType = room.encounter;
-    if (encounterType && roomEncounter[encounterType]) {
-        $("#encounter").append(roomEncounter[encounterType]);
+    // Ensure the encounter is not null and it's an array or a string
+    if (room.encounter) {
+        // Convert the encounter to an array if it's a string
+        const encounters = Array.isArray(room.encounter) ? room.encounter : [room.encounter];
+
+        // Split encounters into enemies and treasures
+        const enemiesInRoom = encounters.filter(item => mazeEnemies.includes(item));
+        const treasuresInRoom = encounters.filter(item => mazeTreasures.includes(item));
+
+        // Display enemies first
+        enemiesInRoom.forEach(enemy => {
+            if (roomEncounter[enemy]) {
+                $("#encounter").append(roomEncounter[enemy]);
+            }
+        });
+
+        // Then display treasures
+        treasuresInRoom.forEach(treasure => {
+            if (roomEncounter[treasure]) {
+                $("#encounter").append(roomEncounter[treasure]);
+            }
+        });
     }
 }
+
 
 function getExitCoordinates(data) {
     for (let i = 0; i < data.mazeSize; i++) {
