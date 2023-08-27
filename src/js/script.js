@@ -3,6 +3,7 @@ let mazeData = null;
 // Global variables
 let playerPosition = { x: 0, y: 0 };
 let score = 0;
+let roomsVisited = 0;
 let duringGame = false;
 let duringEncounter = false;
 let question = false;
@@ -12,10 +13,13 @@ let previousAnnouncement = null;
 
 const directions = ["north", "south", "east", "west"];
 
+// html elements
 let levelSelectWrapper = $('.maze__level-select');
 let levelSelect = $('#level');
 let menuTrolls = $('.maze__menu-troll');
 let menuHeader = $('.menu__heading');
+let scoreTotal = $('#score');
+let roomsTraveled = $('#rooms');
 
 const doors = {
     north: '<span class="doors doors--north"></span>',
@@ -153,6 +157,7 @@ function handleEncounterInput(input) {
 
         if (mazeData.treasures[currentEncounter]) {
             score += mazeData.treasures[currentEncounter].value; // Increment score for treasures
+            scoreTotal.text(score);
         }
 
         // If no more encounters are left in the room
@@ -184,6 +189,8 @@ function movePlayer(direction) {
 
     if (canMoveTo(newX, newY, direction)) {
         leaveRoomInDirection(direction);
+        roomsVisited++;
+        roomsTraveled.text(roomsVisited);
         setTimeout(function () {
             playerPosition.x = newX;
             playerPosition.y = newY;
@@ -266,10 +273,12 @@ function handleEncounter(userInput = null) {
         } else if (userInput === treasureData.action) {
             $("#encounter ." + currentEncounter).addClass('defeated');
             score += treasureData.value;
+            console.log(treasureData.value);
+            scoreTotal.text(score);
             encounters.shift();
             announce(treasureData.victory);
         } else {
-            announce("Wrong action! Try again.");
+            announce("Wrong action! Try again.sssss");
             return;
         }
     } else if (currentEncounter === 'exit') {
@@ -376,6 +385,10 @@ function resetGame() {
 
     // Unload Maze
     maze = null;
+    mazeData = null;
     playerPosition = { x: 0, y: 0 };
     score = 0;
+    roomsVisited = 0;
+    scoreTotal.text(score);
+    roomsTraveled.text(roomsVisited);
 }

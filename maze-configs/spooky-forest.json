@@ -6,7 +6,7 @@
             "image": "<img class='enemy white_troll' src='./dist/assets/monsters/white-troll.png' alt='White troll'>",
             "announcement": "You spotted a white troll! Type 'punch' to defeat it!",
             "action": "punch",
-            "victory": "CO ZA CHUJ! UCIEKL!"
+            "victory": "You punched the white troll! It ran away."
         },
         "green_troll": {
             "name": "Green Troll",
