@@ -61,7 +61,7 @@
             { "doors": { "north": true, "east": false, "south": true, "west": true }, "encounter": ["yellow_troll"] }
         ],
         [
-            { "doors": { "north": true, "east": false, "south": false, "west": false }, "encounter": null },
+            { "doors": { "north": true, "east": true, "south": false, "west": false }, "encounter": null },
             { "doors": { "north": true, "east": false, "south": false, "west": true }, "encounter": ["gold"] },
             { "doors": { "north": true, "east": false, "south": false, "west": false }, "encounter": "exit" }
         ]

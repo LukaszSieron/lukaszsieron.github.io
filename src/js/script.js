@@ -123,6 +123,8 @@ function handleUserInput(input) {
 }
 
 function handleEncounterInput(input) {
+    if (!duringEncounter) return;
+
     const currentRoom = maze[playerPosition.y][playerPosition.x];
     let encounters = currentRoom.encounter;
 
@@ -130,13 +132,9 @@ function handleEncounterInput(input) {
         return;
     }
 
-    if (typeof encounters === 'string') {
-        encounters = [encounters];
-    }
-
+    encounters = Array.isArray(encounters) ? encounters : [encounters];
     const currentEncounter = encounters[0];
 
-    // Determine if the current encounter is an enemy or a treasure
     let encounterData;
     if (mazeData.enemies[currentEncounter]) {
         encounterData = mazeData.enemies[currentEncounter];
@@ -146,8 +144,7 @@ function handleEncounterInput(input) {
         encounterData = { action: 'exit', victory: `You've found the exit! Congratulations.` };
     }
 
-    // Check if the given input matches the required action for the current encounter
-    if (encounterData && input === encounterData.action) {
+    if (input === encounterData.action) {
         encounterAnnounce(encounterData.victory);
 
         // Add 'defeated' class to the next non-defeated image
@@ -160,7 +157,6 @@ function handleEncounterInput(input) {
             scoreTotal.text(score);
         }
 
-        // If no more encounters are left in the room
         if (encounters.length === 0) {
             announce("Room cleared! Move on to the next room.");
             currentRoom.encounter = null;
@@ -246,9 +242,10 @@ function enterRoom() {
     displayEncounter(currentRoom);
 }
 
-function handleEncounter(userInput = null) {
+function handleEncounter() {
     const currentRoom = maze[playerPosition.y][playerPosition.x];
     let encounters = currentRoom.encounter;
+
     if (!encounters) return;
 
     encounters = Array.isArray(encounters) ? encounters : [encounters];
@@ -256,40 +253,12 @@ function handleEncounter(userInput = null) {
 
     if (mazeEnemies.includes(currentEncounter)) {
         const enemyData = mazeData.enemies[currentEncounter];
-        if (userInput === null) {
-            announce(enemyData.announcement);
-        } else if (userInput === enemyData.action) {
-            $("#encounter ." + currentEncounter).addClass('defeated');
-            encounters.shift();
-            announce(enemyData.victory);
-        } else {
-            announce("Wrong action! Try again.");
-            return;
-        }
+        announce(enemyData.announcement);
     } else if (mazeTreasures.includes(currentEncounter)) {
         const treasureData = mazeData.treasures[currentEncounter];
-        if (userInput === null) {
-            announce(treasureData.announcement);
-        } else if (userInput === treasureData.action) {
-            $("#encounter ." + currentEncounter).addClass('defeated');
-            score += treasureData.value;
-            console.log(treasureData.value);
-            scoreTotal.text(score);
-            encounters.shift();
-            announce(treasureData.victory);
-        } else {
-            announce("Wrong action! Try again.sssss");
-            return;
-        }
+        announce(treasureData.announcement);
     } else if (currentEncounter === 'exit') {
-        // Handle the exit logic
-    }
-
-    if (!encounters.length) {
-        currentRoom.encounter = null;
-        moveToCenter();
-        duringEncounter = false;
-        announce("Room cleared!");
+        announce("You've found the exit!!!!!!!! Congratulations.");
     }
 }
 
