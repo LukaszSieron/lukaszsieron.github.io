@@ -21,6 +21,13 @@
             "announcement": "Beware! A yellow troll is blocking your way! Type 'throw' to throw a stone at it!",
             "action": "throw",
             "victory": "You threw a stone at the yellow troll! Its scared away."
+        },
+        "devil": {
+            "name": "Devil",
+            "image": "<img class='enemy devil' src='./dist/assets/monsters/devil.png' alt='Devil'>",
+            "announcement": "Oh no! A devil is blocking your way! Type 'shoot' to shoot it!",
+            "action": "shoot",
+            "victory": "You shot the devil! It ran away."
         }
     },
     "treasures": {
@@ -47,16 +54,24 @@
             "action": "collect",
             "victory": "You collected gold! Score +1000!",
             "value": 1000
+        },
+        "amulet": {
+            "name": "Amulet",
+            "image": "<img class='reward amulet' src='./dist/assets/items/amulet.png' alt='Amulet'>",
+            "announcement": "Oh wow! An golden amulet! Type 'collect' to collect it!",
+            "action": "collect",
+            "victory": "You collected the amulet! Score +1000!",
+            "value": 1000
         }
     },
     "rooms": [
         [
             { "doors": { "north": false, "east": true, "south": true, "west": false }, "encounter": ["diamond"] },
             { "doors": { "north": false, "east": true, "south": true, "west": true }, "encounter": null },
-            { "doors": { "north": false, "east": false, "south": true, "west": true }, "encounter": ["white_troll", "green_troll"] }
+            { "doors": { "north": false, "east": false, "south": true, "west": true }, "encounter": ["white_troll", "green_troll", "devil"] }
         ],
         [
-            { "doors": { "north": true, "east": true, "south": true, "west": false }, "encounter": ["emerald", "diamond"] },
+            { "doors": { "north": true, "east": true, "south": true, "west": false }, "encounter": ["emerald", "diamond", "amulet"] },
             { "doors": { "north": true, "east": true, "south": true, "west": true }, "encounter": ["white_troll", "green_troll", "diamond"] },
             { "doors": { "north": true, "east": false, "south": true, "west": true }, "encounter": ["yellow_troll"] }
         ],

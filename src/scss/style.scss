@@ -445,12 +445,12 @@ button {
 
 @keyframes arriveFromNorthEncounter {
     0% { top: -10%; left: 50%; }
-    100% { top: 20%; left: 50%; }
+    100% { top: 35%; left: 50%; }
 }
 
 @keyframes arriveFromSouthEncounter {
     0% { top: 110%; left: 50%; }
-    100% { top: 80%; left: 50%; }
+    100% { top: 65%; left: 50%; }
 }
 
 @keyframes arriveFromEastEncounter {
@@ -464,12 +464,12 @@ button {
 }
 
 @keyframes toCenterFromNorth {
-    0% { top: 20%; left: 50%; }
+    0% { top: 35%; left: 50%; }
     100% { top: 50%; left: 50%; }
 }
 
 @keyframes toCenterFromSouth {
-    0% { top: 80%; left: 50%; }
+    0% { top: 65%; left: 50%; }
     100% { top: 50%; left: 50%; }
 }
 
