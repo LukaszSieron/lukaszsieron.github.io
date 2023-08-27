@@ -1,7 +1,54 @@
 {
     "mazeSize": 3,
-    "enemies": ["white_troll", "green_troll", "yellow_troll"],
-    "treasures": ["emerald", "diamond", "gold"],
+    "enemies": {
+        "white_troll": {
+            "name": "White Troll",
+            "image": "<img class='enemy white_troll' src='./dist/assets/monsters/white-troll.png' alt='White troll'>",
+            "announcement": "You spotted a white troll! Type 'punch' to defeat it!",
+            "action": "punch",
+            "victory": "CO ZA CHUJ! UCIEKL!"
+        },
+        "green_troll": {
+            "name": "Green Troll",
+            "image": "<img class='enemy green_troll' src='./dist/assets/monsters/green-troll.png' alt='Green troll'>",
+            "announcement": "You encountered a green troll! Type 'kick' to kick it away!",
+            "action": "kick",
+            "victory": "You kicked the green troll! Its gone now."
+        },
+        "yellow_troll": {
+            "name": "Yellow Troll",
+            "image": "<img class='enemy yellow_troll' src='./dist/assets/monsters/yellow-troll.png' alt='Yellow troll'>",
+            "announcement": "Beware! A yellow troll is blocking your way! Type 'throw' to throw a stone at it!",
+            "action": "throw",
+            "victory": "You threw a stone at the yellow troll! Its scared away."
+        }
+    },
+    "treasures": {
+        "diamond": {
+            "name": "Diamond",
+            "image": "<img class='reward diamond' src='./dist/assets/items/diamond.png' alt='Diamond'>",
+            "announcement": "You've found a shining diamond! Type 'pick' to pick it up!",
+            "action": "pick",
+            "victory": "You picked up a diamond! Score +5000!",
+            "value": 5000
+        },
+        "emerald": {
+            "name": "Emerald",
+            "image": "<img class='reward emerald' src='./dist/assets/items/emerald.png' alt='Emerald'>",
+            "announcement": "You've found a gleaming emerald! Type 'grab' to pick it up!",
+            "action": "grab",
+            "victory": "You grabbed an emerald! Score +2500!",
+            "value": 2500
+        },
+        "gold": {
+            "name": "Gold",
+            "image": "<img class='reward gold' src='./dist/assets/items/gold.png' alt='Gold'>",
+            "announcement": "Golden treasures await! Type 'collect' to collect them!",
+            "action": "collect",
+            "victory": "You collected gold! Score +1000!",
+            "value": 1000
+        }
+    },
     "rooms": [
         [
             { "doors": { "north": false, "east": true, "south": true, "west": false }, "encounter": ["diamond"] },
@@ -11,11 +58,11 @@
         [
             { "doors": { "north": true, "east": true, "south": true, "west": false }, "encounter": ["emerald", "diamond"] },
             { "doors": { "north": true, "east": true, "south": true, "west": true }, "encounter": ["white_troll", "green_troll", "diamond"] },
-            { "doors": { "north": true, "east": false, "south": true, "west": true }, "encounter": "yellow_troll" }
+            { "doors": { "north": true, "east": false, "south": true, "west": true }, "encounter": ["yellow_troll"] }
         ],
         [
             { "doors": { "north": true, "east": false, "south": false, "west": false }, "encounter": null },
-            { "doors": { "north": true, "east": false, "south": false, "west": true }, "encounter": "gold" },
+            { "doors": { "north": true, "east": false, "south": false, "west": true }, "encounter": ["gold"] },
             { "doors": { "north": true, "east": false, "south": false, "west": false }, "encounter": "exit" }
         ]
     ]
