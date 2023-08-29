@@ -109,7 +109,7 @@ function handleUserInput(input) {
         question = true;
     } else if (input === 'flag' && !duringEncounter) {
         previousAnnouncement = $('#announcer').text();
-        announce("Insert flag for 100 score points. Pick color, type 'red', 'green', 'yellow' or 'cancel' to cancel.");
+        announce("Insert flag for 100 points. Pick color, type 'red', 'green', 'yellow' or 'cancel' to cancel.");
         flagQuestion = true;
     } else if (flagQuestion) {
         if (input === 'red' || input === 'green' || input === 'yellow') {
@@ -296,7 +296,12 @@ function enterRoom() {
             // End game or progress to next level
         } else {
             duringEncounter = true;
+            // after 1 sec close doors
+            setTimeout(function () {
+                closeDoors();
+            }, 1000);
             handleEncounter();
+
         }
     } else {
         announce("Nothing in this room");

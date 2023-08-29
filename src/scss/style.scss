@@ -39,6 +39,22 @@ button {
         }
     }
 
+    &__score {
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        padding: 10px;
+    }
+
+    &__rooms {
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        padding: 10px;
+    }
+
     &__encounter {
         position: absolute;
         top: 50%;
@@ -142,13 +158,7 @@ button {
     &__main {
     }
 
-    &__interface {
-        flex: 1;
-    }
-
-    &__stats {
-        flex: 1;
-    }
+    
 }
 
 // The enemies and rewards 'deafeat' animations.

@@ -14,11 +14,10 @@
     </div>
     <div class="container"></div>
     <div class="game">
-        <div id="interface" class="game__interface">
-            <button onclick="startGame()">Start Game</button>
-        </div>
         <div class="game__main">        
             <div class="maze" id="maze">
+                <h2 class="maze__score">Score: <span id="score">0</span></h2>
+                <h2 class="maze__rooms">Rooms: <span id="rooms">0</span></h2>
                 <div id="announcer" class="maze__announcer">
                     <h2 class="menu__heading">WELCOME TO THE DUNGEON!</h2><br>
                     Type 'start' to begin your adventure.
@@ -42,11 +41,6 @@
             <input id="userInput" class="game__input" type="text" onSubmit="alert()">
             
         </div>
-        <div class="game__stats">
-            <h2>Score: <span id="score">0</span></h2>
-            <h2>Rooms traversed: <span id="rooms">0</span></h2>
-        </div>
-
     </div>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="./dist/js/main.js"></script>
