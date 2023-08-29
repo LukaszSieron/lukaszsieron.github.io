@@ -16,7 +16,7 @@ const directions = ["north", "south", "east", "west"];
 // html elements
 let levelSelectWrapper = $('.maze__level-select');
 let levelSelect = $('#level');
-let menuTrolls = $('.maze__menu-troll');
+let menuTrolls = $('.dancing-troll');
 let menuHeader = $('.menu__heading');
 let scoreTotal = $('#score');
 let roomsTraveled = $('#rooms');
@@ -49,11 +49,25 @@ function loadMaze() {
             mazeData = data;
             initializeMaze(data);
             updateMazeVisualization();
+
+            // Load the background images
+            loadBackgroundImages(data.background);
         },
         error: function () {
             alert('Failed to load maze.');
         }
     });
+}
+
+function loadBackgroundImages(backgroundSrc) {
+    // Load the background images
+    let loadedBackgroundImg = '<img class="maze__menu-background" src="' + backgroundSrc + '" alt="Background">';
+
+    // create 4 copies of the background image, add class maze__menu-background-- + number to each and append to #maze
+    for (let i = 1; i < 5; i++) {
+        $('#maze').append(loadedBackgroundImg);
+        $('.maze__menu-background').last().addClass('maze__menu-background--' + i);
+    }
 }
 
 function hideMenuItems() {
@@ -345,6 +359,9 @@ function resetGame() {
     menuTrolls.show();
     levelSelectWrapper.show();
     menuHeader.show();
+
+    // delete the background images but not the .dancing-troll
+    $('.maze__menu-background').not('.dancing-troll').remove();
 
     // Remove other classes from the hero element apart from .hero
     $('.hero').attr('class', 'hero');

@@ -1,5 +1,6 @@
 {
     "mazeSize": 3,
+    "background": "./dist/assets/backgrounds/forest.jpg",
     "enemies": {
         "white_troll": {
             "name": "White Troll",
