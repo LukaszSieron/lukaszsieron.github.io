@@ -94,6 +94,11 @@ a {
         left: 0;
 
         padding: 10px;
+
+        &.game-over {
+            top: 45%;
+            left: 5%;
+        }
     }
 
     &__rooms {
@@ -102,6 +107,11 @@ a {
         right: 0;
 
         padding: 10px;
+
+        &.game-over {
+            top: 45%;
+            right: 5%;
+        }
     }
 
     &__encounter {
@@ -472,8 +482,6 @@ a {
     &.toCenterFromWest {
         animation: toCenterFromWest 1s ease-in-out forwards;
     }
-
-
 }
 
 @keyframes arriveFromNorth {

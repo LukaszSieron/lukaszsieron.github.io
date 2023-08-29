@@ -75,6 +75,7 @@ function hideMenuItems() {
     menuTrolls.hide();
     levelSelectWrapper.hide();
     menuHeader.hide();
+
 }
 
 function initializeMaze(data) {
@@ -100,6 +101,7 @@ function handleUserInput(input) {
 
     if (input === "start" && !duringGame) {
         duringGame = true;
+        resetGame();
         hideMenuItems();
         loadMaze();
         announce("You are in a maze. Try to find the exit. Type 'help' for more instructions.");
@@ -297,10 +299,7 @@ function enterRoom() {
         currentRoom.visited = true;
         updateMazeVisualization();
 
-        if (currentRoom.encounter === "exit") {
-            announce("Congratulations! You found the exit!");
-            // End game or progress to next level
-        } else {
+    
             duringEncounter = true;
             // after 1 sec close doors
             setTimeout(function () {
@@ -308,7 +307,7 @@ function enterRoom() {
             }, 1000);
             handleEncounter();
 
-        }
+        
     } else {
         announce("Nothing in this room");
         updateMazeVisualization();
@@ -335,9 +334,31 @@ function handleEncounter() {
         const treasureData = mazeData.treasures[currentEncounter];
         announce(treasureData.announcement);
     } else if (currentEncounter === 'exit') {
-        announce("You've found the exit!!!!!!!! Congratulations.");
+        announce("You've found the exit! Congratulations.");
+        gameOver();
     }
 }
+
+function gameOver() {
+    duringGame = false;
+    duringEncounter = false;
+
+    menuTrolls.show();
+    levelSelectWrapper.show();
+    menuHeader.show();
+
+    // add .game-over class to the hero element, .maze__score and .maze__rooms
+    $('.hero').addClass('game-over');
+    $('.maze__score').addClass('game-over');
+    $('.maze__rooms').addClass('game-over');
+
+    // delete the background images but not the .dancing-troll
+    $('.maze__menu-background').not('.dancing-troll').remove();
+
+    encounterAnnounce("Type start to play again.");
+
+}
+
 
 function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -422,6 +443,11 @@ function resetGame() {
     menuTrolls.show();
     levelSelectWrapper.show();
     menuHeader.show();
+
+    // remove .game-over class from the hero element, .maze__score and .maze__rooms
+    $('.hero').removeClass('game-over');
+    $('.maze__score').removeClass('game-over');
+    $('.maze__rooms').removeClass('game-over');
 
     // delete the background images but not the .dancing-troll
     $('.maze__menu-background').not('.dancing-troll').remove();
