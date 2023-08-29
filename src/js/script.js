@@ -103,7 +103,9 @@ function handleUserInput(input) {
         hideMenuItems();
         loadMaze();
         announce("You are in a maze. Try to find the exit. Type 'help' for more instructions.");
-    } else if (input === "start" && duringGame) {
+    } else if (input === "help") {
+        toggleHelpModal();
+    } else if (input === "start"  && duringGame) {
         previousAnnouncement = $('#announcer').text();
         announce("Do you want to return to the main menu? Type 'yes' or 'no'.");
         question = true;
@@ -182,6 +184,10 @@ function checkForFlag() {
 function updateScore( number ) {
     score += number;
     scoreTotal.text(score);
+}
+
+function toggleHelpModal() {
+    $('.help-modal').toggleClass('hidden');
 }
 
 function handleEncounterInput(input) {
@@ -435,3 +441,11 @@ function resetGame() {
     scoreTotal.text(score);
     roomsTraveled.text(roomsVisited);
 }
+
+$(document).ready(function () {
+    console.log($('.help-modal'));
+    console.log($('#closeModal'));
+    // toggle help modal on click
+    $('#closeModal').on('click', toggleHelpModal);
+
+});
