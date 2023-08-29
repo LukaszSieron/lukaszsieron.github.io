@@ -158,8 +158,7 @@ function insertFlag( color ) {
     flagQuestion = false;
     
     // deduct 100 from score and show new score
-    score -= 100;
-    scoreTotal.text(score);
+    updateScore( -100 );
 
     encounterAnnounce( color + " flag set in this room!");
     announce( previousAnnouncement );
@@ -178,6 +177,11 @@ function checkForFlag() {
         console.log($('#encounter'));
         $('#maze').append('<img class="flag" src="./dist/assets/flags/' + currentRoom.flag + '.jpg" alt="Flag">');
     }
+}
+
+function updateScore( number ) {
+    score += number;
+    scoreTotal.text(score);
 }
 
 function handleEncounterInput(input) {
@@ -211,8 +215,7 @@ function handleEncounterInput(input) {
         encounters.shift(); // Remove the handled encounter
 
         if (mazeData.treasures[currentEncounter]) {
-            score += mazeData.treasures[currentEncounter].value; // Increment score for treasures
-            scoreTotal.text(score);
+            updateScore( mazeData.treasures[currentEncounter].value );
         }
 
         if (encounters.length === 0) {
