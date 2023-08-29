@@ -7,6 +7,7 @@ let roomsVisited = 0;
 let duringGame = false;
 let duringEncounter = false;
 let question = false;
+let flagQuestion = false;
 
 // Needed to store the previous announcement when the player is asked a question
 let previousAnnouncement = null;
@@ -106,6 +107,21 @@ function handleUserInput(input) {
         previousAnnouncement = $('#announcer').text();
         announce("Do you want to return to the main menu? Type 'yes' or 'no'.");
         question = true;
+    } else if (input === 'flag' && !duringEncounter) {
+        previousAnnouncement = $('#announcer').text();
+        announce("Insert flag for 100 score points. Pick color, type 'red', 'green', 'yellow' or 'cancel' to cancel.");
+        flagQuestion = true;
+    } else if (flagQuestion) {
+        if (input === 'red' || input === 'green' || input === 'yellow') {
+            // set flag
+            insertFlag(input);
+        } else if (input === 'cancel') {
+            // cancel flag setting
+            flagQuestion = false;
+            announce( previousAnnouncement );
+        } else {
+            announce("Unknown flag color. Type 'red', 'green', 'yellow' or 'cancel' to cancel.");
+        }
     } else if (question) {
         if (input === "yes") {
             // Reset everything
@@ -133,6 +149,34 @@ function handleUserInput(input) {
         handleEncounterInput(input);
     } else {
         announce("Unknown command. Type 'help' for more instructions.");
+    }
+}
+
+function insertFlag( color ) {
+    // set current room encounter to red flag
+    maze[playerPosition.y][playerPosition.x].flag = color + '-flag';
+    flagQuestion = false;
+    
+    // deduct 100 from score and show new score
+    score -= 100;
+    scoreTotal.text(score);
+
+    encounterAnnounce( color + " flag set in this room!");
+    announce( previousAnnouncement );
+    // add flag img to the room
+    $('#maze').append('<img class="flag" src="./dist/assets/flags/' + color + '-flag.jpg" alt="Flag">');
+}
+
+function checkForFlag() {
+    // Remove any existing flag images
+    $('.flag').remove();
+    const currentRoom = maze[playerPosition.y][playerPosition.x];
+    
+    if (currentRoom.flag) {
+        // add flag img to the room
+        console.log(currentRoom.flag + '-flag no jest');
+        console.log($('#encounter'));
+        $('#maze').append('<img class="flag" src="./dist/assets/flags/' + currentRoom.flag + '.jpg" alt="Flag">');
     }
 }
 
@@ -233,10 +277,14 @@ function updateMazeVisualization() {
 
 function enterRoom() {
     const currentRoom = maze[playerPosition.y][playerPosition.x];
+    console.log(currentRoom.flag);
     // reset encounterAnnouncer
     encounterAnnounce("");
 
     if (!currentRoom.visited && currentRoom.encounter !== null) {
+        // remove flag img from the room if arrived from room where you set one
+        $('.flag').remove();
+
         currentRoom.visited = true;
         updateMazeVisualization();
 
@@ -250,6 +298,7 @@ function enterRoom() {
     } else {
         announce("Nothing in this room");
         updateMazeVisualization();
+        checkForFlag();
     }
 
     renderMazeInConsole();
