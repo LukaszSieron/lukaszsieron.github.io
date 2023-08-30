@@ -10,7 +10,6 @@ let question = false;
 let flagQuestion = false;
 let enemyTimer; // to hold the interval for decrementing score due to enemies
 
-
 // Needed to store the previous announcement when the player is asked a question
 let previousAnnouncement = null;
 
@@ -30,6 +29,9 @@ const doors = {
     south: '<span class="doors doors--south"></span>',
     west: '<span class="doors doors--west"></span>'
 }
+
+// toggle help modal on click
+$('#closeModal').on('click', toggleHelpModal);
 
 // User input handling
 $("#userInput").keypress(function (e) {
@@ -97,6 +99,10 @@ function initializeMaze(data) {
         playerPosition.x = getRandomInt(mazeSize);
         playerPosition.y = getRandomInt(mazeSize);
     } while (getDistance(playerPosition, exit) < 3);
+
+    // Clear the encounter in the initial room
+    maze[playerPosition.y][playerPosition.x].encounter = null;
+    maze[playerPosition.y][playerPosition.x].visited = true;
 }
 
 function handleUserInput(input) {
@@ -236,11 +242,9 @@ function handleEncounterInput(input) {
     }
 
     if (input === encounterData.action) {
-        console.log('Defeated an enemy.'); // Debug
         encounterAnnounce(encounterData.victory);
 
         // Stop the existing enemy timer
-        console.log('Stopping enemy timer with ID:', enemyTimer); // Debug
         clearInterval(enemyTimer);
 
         // Add 'defeated' class to the next non-defeated image
@@ -528,11 +532,3 @@ function resetGame() {
     scoreTotal.text(score);
     roomsTraveled.text(roomsVisited);
 }
-
-$(document).ready(function () {
-    console.log($('.help-modal'));
-    console.log($('#closeModal'));
-    // toggle help modal on click
-    $('#closeModal').on('click', toggleHelpModal);
-
-});
