@@ -241,8 +241,54 @@ a {
     
 }
 
-// The enemies and rewards 'deafeat' animations.
+// The enemies and rewards 'defeat' animations.
 .enemy {
+
+    &--wrapper {
+        display: inline-block;
+        
+        &.fight:has(img:not(.defeated)) {
+            position: relative;
+            animation: erratically 1s ease-in-out infinite;
+
+            @keyframes erratically {
+                0% { transform: translate(0, 0); }
+                10% { transform: translate(5px, 5px); }
+                20% { transform: translate(0, 0); }
+                30% { transform: translate(-5px, -5px); }
+                40% { transform: translate(0, 0); }
+                50% { transform: translate(-5px, 5px); }
+                60% { transform: translate(0, 0); }
+                70% { transform: translate(5px, -5px); }
+                80% { transform: translate(0, 0); }
+                90% { transform: translate(5px, 5px); }
+                100% { transform: translate(0, 0); }
+
+            }
+    
+            &::before {
+                content: "-100";
+                font-size: 24px;
+                width: auto;
+                height: auto;
+                position: absolute;
+                top: -20px;
+                left: 0;
+                animation: textFloat 2s ease-in-out infinite;
+
+                @keyframes textFloat {
+                    0% {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                    100% {
+                        opacity: 0; 
+                        transform: translateY(-30px); 
+                    }
+                }                
+            }
+        }
+    }
 
     &.defeated {
         animation: defeated 1s ease-in forwards;

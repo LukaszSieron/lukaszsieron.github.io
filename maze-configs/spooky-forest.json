@@ -4,29 +4,29 @@
     "enemies": {
         "white_troll": {
             "name": "White Troll",
-            "image": "<img class='enemy white_troll' src='./dist/assets/monsters/white-troll.png' alt='White troll'>",
-            "announcement": "You spotted a white troll! Type 'punch' to defeat it!",
+            "image": "<img class='enemy white_troll attacking' src='./dist/assets/monsters/white-troll.png' alt='White troll'>",
+            "announcement": "You spotted a white troll! Type 'PUNCH' to defeat it!",
             "action": "punch",
             "victory": "You punched the white troll! It ran away."
         },
         "floating_eyes": {
             "name": "Floating Eyes",
             "image": "<img class='enemy floating-eyes' src='./dist/assets/monsters/floating-eyes.png' alt='Floating Eyes'>",
-            "announcement": "You encountered a floating eyes! Type 'splash' to splash it with water!",
+            "announcement": "You encountered a floating eyes! Type 'SPLASH' to splash it with water!",
             "action": "splash",
             "victory": "You splashed the floating eyes! It ran away."
         },
         "angry_head": {
             "name": "Angry Head",
             "image": "<img class='enemy yellow_troll' src='./dist/assets/monsters/angry-head.png' alt='Angry head'>",
-            "announcement": "You encountered an angry head! Type 'throw' to throw a stone at it!",
+            "announcement": "You encountered an angry head! Type 'THROW' to throw a stone at it!",
             "action": "throw",
             "victory": "You threw a stone at the angry head! Its scared away."
         },
         "devil": {
             "name": "Devil",
             "image": "<img class='enemy devil' src='./dist/assets/monsters/devil.png' alt='Devil'>",
-            "announcement": "Oh no! A devil is blocking your way! Type 'shoot' to shoot it!",
+            "announcement": "Oh no! A devil is blocking your way! Type 'SHOOT' to shoot it!",
             "action": "shoot",
             "victory": "You shot the devil! It ran away."
         }
@@ -35,7 +35,7 @@
         "diamond": {
             "name": "Diamond",
             "image": "<img class='reward diamond' src='./dist/assets/items/diamond.png' alt='Diamond'>",
-            "announcement": "You've found a shining diamond! Type 'pick' to pick it up!",
+            "announcement": "You've found a shining diamond! Type 'PICK' to pick it up!",
             "action": "pick",
             "victory": "You picked up a diamond! Score +5000!",
             "value": 5000
@@ -43,7 +43,7 @@
         "gold": {
             "name": "Gold",
             "image": "<img class='reward gold' src='./dist/assets/items/gold.png' alt='Gold'>",
-            "announcement": "Golden treasures await! Type 'collect' to collect them!",
+            "announcement": "Golden treasures await! Type 'COLLECT' to collect them!",
             "action": "collect",
             "victory": "You collected gold! Score +1000!",
             "value": 1000
@@ -51,7 +51,7 @@
         "amulet": {
             "name": "Amulet",
             "image": "<img class='reward amulet' src='./dist/assets/items/amulet.png' alt='Amulet'>",
-            "announcement": "Oh wow! An golden amulet! Type 'collect' to collect it!",
+            "announcement": "Oh wow! An golden amulet! Type 'COLLECT' to collect it!",
             "action": "collect",
             "victory": "You collected the amulet! Score +1000!",
             "value": 1000
