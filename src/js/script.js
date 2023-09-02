@@ -402,6 +402,9 @@ function resetGame() {
     levelSelectWrapper.show();
     menuHeader.show();
 
+    //remove all .doors elements
+    $('.doors').remove();
+
     // remove .game-over class from the hero element, .maze__score and .maze__rooms
     $('.hero').removeClass('game-over');
     $('.maze__score').removeClass('game-over');

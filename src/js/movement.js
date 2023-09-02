@@ -2,6 +2,11 @@ function movePlayer(direction) {
     let newX = playerPosition.x;
     let newY = playerPosition.y;
 
+    if (!duringGame) {
+        announce("You must start the game first!");
+        return;
+    }
+
     switch (direction) {
         case "north": newY--; break;
         case "south": newY++; break;
