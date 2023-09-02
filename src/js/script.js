@@ -69,133 +69,6 @@ function loadMaze() {
     });
 }
 
-function validateMaze(data) {
-    let result = { isValid: true, message: '' };
-
-    if (!hasSingleExit(data)) {
-        result.isValid = false;
-        result.message = 'Maze must have exactly one exit.';
-        return result;
-    }
-
-    if (!validateDoorIntegrity(data)) {
-        result.isValid = false;
-        result.message = 'Some rooms have doors that lead to nowhere.';
-        return result;
-    }
-
-    if (!isMazeSolvable(data)) {
-        result.isValid = false;
-        result.message = 'The maze is not solvable from every room.';
-        return result;
-    }
-
-    return result;
-}
-
-function hasSingleExit(data) {
-    let exitCount = 0;
-    let exitLocations = [];
-
-    for (let i = 0; i < data.rooms.length; i++) {
-        const row = data.rooms[i];
-        for (let j = 0; j < row.length; j++) {
-            const room = row[j];
-            if (room.encounter === "exit") {
-                exitCount++;
-                exitLocations.push(`row ${i + 1}, column ${j + 1}`);
-            }
-        }
-    }
-
-    if (exitCount !== 1) {
-        console.log(`Invalid number of exits: ${exitCount}. Exits found at ${exitLocations.join(', ')}.`);
-    }
-
-    return exitCount === 1;
-}
-
-function validateDoorIntegrity(data) {
-    const rows = data.rooms.length;
-    const cols = data.rooms[0].length;
-
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            const room = data.rooms[i][j];
-            const doors = room.doors;
-
-            if (doors.north && (i === 0 || !data.rooms[i - 1][j].doors.south)) {
-                console.log(`Integrity failed at row ${i + 1}, column ${j + 1}: Door to the north doesn't match.`);
-                return false;
-            }
-            if (doors.south && (i === rows - 1 || !data.rooms[i + 1][j].doors.north)) {
-                console.log(`Integrity failed at row ${i + 1}, column ${j + 1}: Door to the south doesn't match.`);
-                return false;
-            }
-            if (doors.east && (j === cols - 1 || !data.rooms[i][j + 1].doors.west)) {
-                console.log(`Integrity failed at row ${i + 1}, column ${j + 1}: Door to the east doesn't match.`);
-                return false;
-            }
-            if (doors.west && (j === 0 || !data.rooms[i][j - 1].doors.east)) {
-                console.log(`Integrity failed at row ${i + 1}, column ${j + 1}: Door to the west doesn't match.`);
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-function isMazeSolvable(data) {
-    const rows = data.rooms.length;
-    const cols = data.rooms[0].length;
-    let exitLocation = null;
-
-    // Find the exit location
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            if (data.rooms[i][j].encounter === "exit") {
-                exitLocation = { row: i, col: j };
-                break;
-            }
-        }
-        if (exitLocation) break;
-    }
-
-    // Depth-first search function to explore the maze
-    function dfs(row, col, visited) {
-        if (row < 0 || row >= rows || col < 0 || col >= cols || visited[row][col]) {
-            return false;
-        }
-
-        if (row === exitLocation.row && col === exitLocation.col) {
-            return true;
-        }
-
-        visited[row][col] = true;
-
-        const doors = data.rooms[row][col].doors;
-
-        return (doors.north && dfs(row - 1, col, visited)) ||
-            (doors.south && dfs(row + 1, col, visited)) ||
-            (doors.east && dfs(row, col + 1, visited)) ||
-            (doors.west && dfs(row, col - 1, visited));
-    }
-
-    // Check solvability from each room
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            const visited = Array.from({ length: rows }, () => Array(cols).fill(false));
-            if (!dfs(i, j, visited)) {
-                console.log(`Maze is not solvable from row ${i + 1}, column ${j + 1}.`);
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
 function loadBackgroundImages(backgroundSrc) {
     // Load the background images
     let loadedBackgroundImg = '<img class="maze__menu-background" src="' + backgroundSrc + '" alt="Background">';
@@ -205,13 +78,6 @@ function loadBackgroundImages(backgroundSrc) {
         $('#maze').append(loadedBackgroundImg);
         $('.maze__menu-background').last().addClass('maze__menu-background--' + i);
     }
-}
-
-function hideMenuItems() {
-    menuTrolls.hide();
-    levelSelectWrapper.hide();
-    menuHeader.hide();
-
 }
 
 function initializeMaze(data) {
@@ -321,18 +187,6 @@ function checkForFlag() {
     }
 }
 
-function updateScore(amount) {
-    score += amount;
-
-    // Ensure the score doesn't go below zero
-    if (score < 0) {
-        score = 0;
-    }
-
-    // Update the score display
-    scoreTotal.text(score);
-}
-
 function toggleHelpModal() {
     $('.help-modal').toggleClass('hidden');
 }
@@ -404,7 +258,7 @@ function handleEncounterInput(input) {
         } else {
             // Update the timer for remaining enemies
             stopEnemyTimer();
-            startEnemyTimer(remainingEnemies); // Notice the change here
+            startEnemyTimer(remainingEnemies);
             // Otherwise, proceed to the next encounter in the list
             handleEncounter();
         }
@@ -412,37 +266,6 @@ function handleEncounterInput(input) {
         encounterAnnounce("Wrong action! Try again.");
     }
 }
-
-
-function movePlayer(direction) {
-    let newX = playerPosition.x;
-    let newY = playerPosition.y;
-
-    switch (direction) {
-        case "north": newY--; break;
-        case "south": newY++; break;
-        case "east": newX++; break;
-        case "west": newX--; break;
-    }
-
-    if (canMoveTo(newX, newY, direction)) {
-        leaveRoomInDirection(direction);
-        roomsVisited++;
-        roomsTraveled.text(roomsVisited);
-        setTimeout(function () {
-            playerPosition.x = newX;
-            playerPosition.y = newY;
-            enterRoomFromDirection(direction);
-        }, 1000);
-    } else {
-        announce("You can't go that way!");
-    }
-}
-
-function canMoveTo(x, y, direction) {
-    return x >= 0 && y >= 0 && x < mazeSize && y < mazeSize && maze[playerPosition.y][playerPosition.x].doors[direction];
-}
-
 
 function updateMazeVisualization() {
     // Clear any existing door elements from the previous room
@@ -552,40 +375,6 @@ function gameOver() {
 
 }
 
-
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-}
-
-function getDistance(pos1, pos2) {
-    return Math.abs(pos1.x - pos2.x) + Math.abs(pos1.y - pos2.y);
-}
-
-function renderMazeInConsole() {
-    let visualization = "";
-
-    for (let i = 0; i < mazeSize; i++) {
-        for (let j = 0; j < mazeSize; j++) {
-            if (j == 0) {
-                visualization += "|";
-            }
-
-            if (playerPosition.y == i && playerPosition.x == j) {
-                visualization += " X ";
-            } else {
-                visualization += "   ";
-            }
-
-            visualization += "|";
-        }
-        visualization += "\n";
-        visualization += Array(mazeSize * 4 + 1).join("_");
-        visualization += "\n";
-    }
-
-    console.log(visualization);
-}
-
 function displayEncounter(room) {
     $('#encounter').empty();
     if (room.encounter) {
@@ -605,34 +394,6 @@ function displayEncounter(room) {
             $("#encounter").append(content);
         });
     }
-}
-
-
-function getExitCoordinates(data) {
-    for (let i = 0; i < data.mazeSize; i++) {
-        for (let j = 0; j < data.mazeSize; j++) {
-            if (data.rooms[i][j].encounter === "exit") {
-                return { x: j, y: i };
-            }
-        }
-    }
-    return null; // This will return null if no exit is found, but in a well-designed game, there should always be an exit.
-}
-
-function announce(message) {
-    $('#announcer').text(message);
-}
-
-function encounterAnnounce(message) {
-    $('#encounterAnnouncer').text(message);
-}
-
-function closeDoors() {
-    $('.doors').addClass('closed');
-}
-
-function openDoors() {
-    $('.doors').removeClass('closed');
 }
 
 function resetGame() {

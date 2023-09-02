@@ -1,3 +1,31 @@
+function movePlayer(direction) {
+    let newX = playerPosition.x;
+    let newY = playerPosition.y;
+
+    switch (direction) {
+        case "north": newY--; break;
+        case "south": newY++; break;
+        case "east": newX++; break;
+        case "west": newX--; break;
+    }
+
+    if (canMoveTo(newX, newY, direction)) {
+        leaveRoomInDirection(direction);
+        roomsVisited++;
+        roomsTraveled.text(roomsVisited);
+        setTimeout(function () {
+            playerPosition.x = newX;
+            playerPosition.y = newY;
+            enterRoomFromDirection(direction);
+        }, 1000);
+    } else {
+        announce("You can't go that way!");
+    }
+}
+
+function canMoveTo(x, y, direction) {
+    return x >= 0 && y >= 0 && x < mazeSize && y < mazeSize && maze[playerPosition.y][playerPosition.x].doors[direction];
+}
 
 function enterRoomFromDirection(direction) {
     const currentRoom = maze[playerPosition.y][playerPosition.x];
