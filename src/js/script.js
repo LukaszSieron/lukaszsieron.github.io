@@ -43,6 +43,10 @@ $("#userInput").keypress(function (e) {
     }
 });
 
+/**
+ * Asynchronously loads the maze configuration based on the selected level.
+ * Initializes the maze if the configuration is valid.
+ */
 async function loadMaze() {
     const level = levelSelect.val();
     try {
@@ -62,12 +66,20 @@ async function loadMaze() {
     }
 }
 
+/**
+ * Loads background images into the maze.
+ * @param {string} backgroundSrc - The source URL of the background image.
+ */
 function loadBackgroundImages(backgroundSrc) {
     for (let i = 1; i <= 4; i++) {
         $('#maze').append(`<img class="maze__menu-background maze__menu-background--${i}" src="${backgroundSrc}" alt="Background">`);
     }
 }
 
+/**
+ * Initializes the maze variables and sets the initial player position.
+ * @param {Object} data - The maze configuration data.
+ */
 function initializeMaze(data) {
     mazeSize = data.mazeSize;
     maze = data.rooms;
@@ -78,6 +90,9 @@ function initializeMaze(data) {
     clearInitialRoom();
 }
 
+/**
+ * Sets the initial player position randomly, ensuring it is at least 3 units away from the exit.
+ */
 function setInitialPlayerPosition() {
     do {
         playerPosition.x = getRandomInt(mazeSize);
@@ -85,18 +100,25 @@ function setInitialPlayerPosition() {
     } while (getDistance(playerPosition, exit) < 3);
 }
 
+/**
+ * Clears any encounters in the initial room and marks it as visited.
+ */
 function clearInitialRoom() {
     maze[playerPosition.y][playerPosition.x].encounter = null;
     maze[playerPosition.y][playerPosition.x].visited = true;
 }
 
+/**
+ * Main function to handle user input. Delegates to specific handlers based on the game state.
+ * @param {string} input - The user's input command.
+ */
 function handleUserInput(input) {
     if (!duringGame) {
         handleMenuState(input);
     } else if (duringGame && !duringEncounter && !question && !flagQuestion) {
         handleGameState(input);
     } else if (duringEncounter) {
-        handleEncounterState(input);
+        handleEncounterInput(input);
     } else if (question) {
         handleQuestionState(input);
     } else if (flagQuestion) {
@@ -106,6 +128,10 @@ function handleUserInput(input) {
     }
 }
 
+/**
+ * Handles user input when the game is in the menu state.
+ * @param {string} input - The user's input command.
+ */
 function handleMenuState(input) {
     if (input === "start") {
         duringGame = true;
@@ -120,6 +146,10 @@ function handleMenuState(input) {
     }
 }
 
+/**
+ * Handles user input during the main game state, but not during encounters or questions.
+ * @param {string} input - The user's input command.
+ */
 function handleGameState(input) {
     if (input === "start") {
         previousAnnouncement = $('#announcer').text();
@@ -136,10 +166,10 @@ function handleGameState(input) {
     }
 }
 
-function handleEncounterState(input) {
-    handleEncounterInput(input);
-}
-
+/**
+ * Handles user input when a yes/no question is being asked.
+ * @param {string} input - The user's input command.
+ */
 function handleQuestionState(input) {
     if (input === "yes") {
         duringGame = false;
@@ -155,6 +185,10 @@ function handleQuestionState(input) {
     }
 }
 
+/**
+ * Handles user input when the player is asked to insert a flag.
+ * @param {string} input - The user's input command.
+ */
 function handleFlagQuestionState(input) {
     if (input === 'red' || input === 'green' || input === 'yellow') {
         insertFlag(input);
@@ -166,6 +200,10 @@ function handleFlagQuestionState(input) {
     }
 }
 
+/**
+ * Inserts a flag of the given color into the current room, updates the score, and displays the flag.
+ * @param {string} color - The color of the flag to insert.
+ */
 function insertFlag(color) {
     setFlagInCurrentRoom(color);
     updateScore(-100);
@@ -175,14 +213,25 @@ function insertFlag(color) {
     announce(previousAnnouncement);
 }
 
+/**
+ * Sets a flag of the given color in the current room.
+ * @param {string} color - The color of the flag to set.
+ */
 function setFlagInCurrentRoom(color) {
     maze[playerPosition.y][playerPosition.x].flag = `${color}-flag`;
 }
 
+/**
+ * Displays a flag of the given color in the maze.
+ * @param {string} color - The color of the flag to display.
+ */
 function displayFlag(color) {
     $('#maze').append(`<img class="flag" src="./dist/assets/flags/${color}-flag.jpg" alt="Flag">`);
 }
 
+/**
+ * Checks for the presence of a flag in the current room and displays it if found.
+ */
 function checkForFlag() {
     $('.flag').remove();
     const currentRoom = maze[playerPosition.y][playerPosition.x];
@@ -191,10 +240,17 @@ function checkForFlag() {
     }
 }
 
+/**
+ * Toggles the visibility of the help modal.
+ */
 function toggleHelpModal() {
     $('.help-modal').toggleClass('hidden');
 }
 
+/**
+ * Starts a timer that decrements the player's score based on the number of enemies.
+ * @param {number} numEnemies - The number of enemies in the room.
+ */
 function startEnemyTimer(numEnemies) {
     const decrementScore = () => {
         updateScore(-100 * numEnemies);
@@ -206,10 +262,17 @@ function startEnemyTimer(numEnemies) {
     enemyTimer = setInterval(decrementScore, 2000);
 }
 
+/**
+ * Stops the enemy timer, halting the decrement of the player's score.
+ */
 function stopEnemyTimer() {
     clearInterval(enemyTimer);
 }
 
+/**
+ * Handles user input during an encounter with an enemy, treasure, or exit.
+ * @param {string} input - The user's input command.
+ */
 function handleEncounterInput(input) {
     if (!duringEncounter) return;
 
@@ -270,14 +333,26 @@ function handleEncounterInput(input) {
     }
 }
 
+/**
+ * Returns the encounters in the given room as an array.
+ * @param {object} room - The room to check for encounters.
+ * @returns {array} - The encounters in the room.
+ */
 function getEncounters(room) {
     return Array.isArray(room.encounter) ? room.encounter : [room.encounter];
 }
 
+/**
+ * Returns the current room the player is in.
+ * @returns {object} - The current room.
+ */
 function getCurrentRoom() {
     return maze[playerPosition.y][playerPosition.x];
 }
 
+/**
+ * Handles the encounter logic for the current room, announcing what the player has encountered.
+ */
 function handleEncounter() {
     const currentRoom = getCurrentRoom();
     const encounters = getEncounters(currentRoom);
@@ -299,6 +374,9 @@ function handleEncounter() {
     }
 }
 
+/**
+ * Updates the maze visualization by displaying available doors in the current room.
+ */
 function updateMazeVisualization() {
     // Clear any existing door elements from the previous room
     $('.doors').remove();
@@ -315,6 +393,10 @@ function updateMazeVisualization() {
     }
 }
 
+/**
+ * Displays the encounters (enemies, treasures, or exit) in the current room.
+ * @param {object} room - The current room.
+ */
 function displayEncounter(room) {
     $('#encounter').empty();
     if (room.encounter) {
@@ -336,6 +418,9 @@ function displayEncounter(room) {
     }
 }
 
+/**
+ * Handles the logic for entering a room, including encounters and updates.
+ */
 function enterRoom() {
     const currentRoom = maze[playerPosition.y][playerPosition.x];
     resetEncounterAnnouncer();
@@ -350,10 +435,17 @@ function enterRoom() {
     displayEncounter(currentRoom);
 }
 
+/**
+ * Resets the encounter announcer to its default state.
+ */
 function resetEncounterAnnouncer() {
     encounterAnnounce("");
 }
 
+/**
+ * Handles the logic for the first time a player enters a room.
+ * @param {object} currentRoom - The room the player is entering for the first time.
+ */
 function handleFirstTimeEntry(currentRoom) {
     $('.flag').remove();  // Remove flag img from the room if arrived from room where you set one
     currentRoom.visited = true;  // Mark the room as visited
@@ -372,6 +464,10 @@ function handleFirstTimeEntry(currentRoom) {
     if (numEnemies > 0) startEnemyTimer(numEnemies);
 }
 
+/**
+ * Handles the logic for when a player re-enters a room.
+ * @param {object} currentRoom - The room the player is re-entering.
+ */
 function handleRepeatedEntry(currentRoom) {
     announce("Nothing in this room");
     updateMazeVisualization();
@@ -383,16 +479,25 @@ function toggleGameOverClasses(add) {
     classes.forEach(cls => $(`.${cls}`).toggleClass('game-over', add));
 }
 
+/**
+ * Shows the menu items that are hidden during the game.
+ */
 function showMenuItems() {
     menuTrolls.show();
     levelSelectWrapper.show();
     menuHeader.show();
 }
 
+/**
+ * Removes the background images, except for the dancing troll.
+ */
 function removeBackgroundImages() {
     $('.maze__menu-background').not('.dancing-troll').remove();
 }
 
+/**
+ * Handles the game over state, including UI updates.
+ */
 function gameOver() {
     duringGame = false;
     duringEncounter = false;
@@ -404,6 +509,9 @@ function gameOver() {
     encounterAnnounce("Type start to play again.");
 }
 
+/**
+ * Resets the game to its initial state.
+ */
 function resetGame() {
     showMenuItems();
     $('.doors').remove();  // Remove all .doors elements

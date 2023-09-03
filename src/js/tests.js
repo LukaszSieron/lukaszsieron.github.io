@@ -1,3 +1,8 @@
+/**
+ * Validates the integrity and solvability of the maze.
+ * @param {Object} data - The maze data.
+ * @returns {Object} - An object containing a boolean indicating validity and a message string.
+ */
 function validateMaze(data) {
     let result = { isValid: true, message: '' };
 
@@ -22,6 +27,11 @@ function validateMaze(data) {
     return result;
 }
 
+/**
+ * Checks if the maze has exactly one exit.
+ * @param {Object} data - The maze data.
+ * @returns {boolean} - True if there's exactly one exit, false otherwise.
+ */
 function hasSingleExit(data) {
     let exitCount = 0;
     let exitLocations = [];
@@ -44,6 +54,11 @@ function hasSingleExit(data) {
     return exitCount === 1;
 }
 
+/**
+ * Validates that all doors in the maze lead to another room with a matching door.
+ * @param {Object} data - The maze data.
+ * @returns {boolean} - True if all doors are valid, false otherwise.
+ */
 function validateDoorIntegrity(data) {
     const rows = data.rooms.length;
     const cols = data.rooms[0].length;
@@ -75,6 +90,11 @@ function validateDoorIntegrity(data) {
     return true;
 }
 
+/**
+ * Checks if the maze is solvable from every room.
+ * @param {Object} data - The maze data.
+ * @returns {boolean} - True if the maze is solvable, false otherwise.
+ */
 function isMazeSolvable(data) {
     const rows = data.rooms.length;
     const cols = data.rooms[0].length;
