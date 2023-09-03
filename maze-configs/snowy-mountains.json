@@ -60,9 +60,9 @@
     "rooms": [
         [
             { "doors": { "north": false, "east": false, "south": true, "west": false }, "encounter": "exit" },
-            { "doors": { "north": false, "east": false, "south": true, "west": false }, "encounter": ["devil"] },
+            { "doors": { "north": false, "east": false, "south": true, "west": false }, "encounter": ["devil", "amulet"] },
             { "doors": { "north": false, "east": true, "south": false, "west": false }, "encounter": ["white_troll", "gold"] },
-            { "doors": { "north": false, "east": false, "south": true, "west": true }, "encounter": ["floating_eyes"] }
+            { "doors": { "north": false, "east": false, "south": true, "west": true }, "encounter": ["floating_eyes", "diamond"] }
         ],
         [
             { "doors": { "north": true, "east": true, "south": true, "west": false }, "encounter": ["devil", "diamond"] },
@@ -73,8 +73,8 @@
         [
             { "doors": { "north": true, "east": false, "south": true, "west": false }, "encounter": ["devil"] },
             { "doors": { "north": true, "east": true, "south": true, "west": false }, "encounter": ["white_troll", "gold"] },
-            { "doors": { "north": true, "east": false, "south": true, "west": true }, "encounter": ["floating_eyes"] },
-            { "doors": { "north": true, "east": false, "south": true, "west": false }, "encounter": ["angry_head"] }
+            { "doors": { "north": true, "east": false, "south": true, "west": true }, "encounter": ["floating_eyes", "gold"] },
+            { "doors": { "north": true, "east": false, "south": true, "west": false }, "encounter": ["angry_head", "amulet"] }
         ],
         [
             { "doors": { "north": true, "east": true, "south": false, "west": false }, "encounter": ["gold", "diamond"] },
