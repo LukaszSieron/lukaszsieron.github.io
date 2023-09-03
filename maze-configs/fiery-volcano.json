@@ -53,8 +53,8 @@
             "image": "<img class='reward amulet' src='./dist/assets/items/amulet.png' alt='Amulet'>",
             "announcement": "Oh wow! An golden amulet! Type 'GRAB' to collect it!",
             "action": "grab",
-            "victory": "You collected the amulet! Score +1000!",
-            "value": 1000
+            "victory": "You collected the amulet! Score +2500!",
+            "value": 2500
         }
     },
     "rooms": [

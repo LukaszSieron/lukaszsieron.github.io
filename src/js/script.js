@@ -43,69 +43,71 @@ $("#userInput").keypress(function (e) {
     }
 });
 
-function loadMaze() {
-    let level = levelSelect.val();
-
-    $.ajax({
-        url: './maze-configs/' + level + '.json',
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-            const validationResult = validateMaze(data);
-            if (validationResult.isValid) {
-                mazeData = data;
-                initializeMaze(data);
-                updateMazeVisualization();
-
-                // Load the background images
-                loadBackgroundImages(data.background);
-            } else {
-                alert(`Invalid maze configuration: ${validationResult.message}`);
-            }
-        },
-        error: function () {
-            alert('Failed to load maze.');
+async function loadMaze() {
+    const level = levelSelect.val();
+    try {
+        const response = await fetch(`./maze-configs/${level}.json`);
+        const data = await response.json();
+        const validationResult = validateMaze(data);
+        if (validationResult.isValid) {
+            mazeData = data;
+            initializeMaze(data);
+            updateMazeVisualization();
+            loadBackgroundImages(data.background);
+        } else {
+            alert(`Invalid maze configuration: ${validationResult.message}`);
         }
-    });
+    } catch (error) {
+        alert('Failed to load maze.');
+    }
 }
 
 function loadBackgroundImages(backgroundSrc) {
-    // Load the background images
-    let loadedBackgroundImg = '<img class="maze__menu-background" src="' + backgroundSrc + '" alt="Background">';
-
-    // create 4 copies of the background image, add class maze__menu-background-- + number to each and append to #maze
-    for (let i = 1; i < 5; i++) {
-        $('#maze').append(loadedBackgroundImg);
-        $('.maze__menu-background').last().addClass('maze__menu-background--' + i);
+    for (let i = 1; i <= 4; i++) {
+        $('#maze').append(`<img class="maze__menu-background maze__menu-background--${i}" src="${backgroundSrc}" alt="Background">`);
     }
 }
 
 function initializeMaze(data) {
     mazeSize = data.mazeSize;
     maze = data.rooms;
-    mazeEnemies = Object.keys(data.enemies);  // get enemy keys
-    mazeTreasures = Object.keys(data.treasures);  // get treasure keys
+    mazeEnemies = Object.keys(data.enemies);
+    mazeTreasures = Object.keys(data.treasures);
     exit = getExitCoordinates(data);
+    setInitialPlayerPosition();
+    clearInitialRoom();
+}
 
-    for (let i = 0; i < mazeSize; i++) {
-        for (let j = 0; j < mazeSize; j++) {
-            maze[i][j].visited = false;
-        }
-    }
-
+function setInitialPlayerPosition() {
     do {
         playerPosition.x = getRandomInt(mazeSize);
         playerPosition.y = getRandomInt(mazeSize);
     } while (getDistance(playerPosition, exit) < 3);
+}
 
-    // Clear the encounter in the initial room
+function clearInitialRoom() {
     maze[playerPosition.y][playerPosition.x].encounter = null;
     maze[playerPosition.y][playerPosition.x].visited = true;
 }
 
 function handleUserInput(input) {
+    if (!duringGame) {
+        handleMenuState(input);
+    } else if (duringGame && !duringEncounter && !question && !flagQuestion) {
+        handleGameState(input);
+    } else if (duringEncounter) {
+        handleEncounterState(input);
+    } else if (question) {
+        handleQuestionState(input);
+    } else if (flagQuestion) {
+        handleFlagQuestionState(input);
+    } else {
+        announce("Unknown command. Type 'help' for more instructions.");
+    }
+}
 
-    if (input === "start" && !duringGame) {
+function handleMenuState(input) {
+    if (input === "start") {
         duringGame = true;
         resetGame();
         hideMenuItems();
@@ -113,77 +115,79 @@ function handleUserInput(input) {
         announce("You are in a maze. Try to find the exit. Type 'help' for more instructions.");
     } else if (input === "help") {
         toggleHelpModal();
-    } else if (input === "start" && duringGame) {
-        previousAnnouncement = $('#announcer').text();
-        announce("Do you want to return to the main menu? Type 'yes' or 'no'.");
-        question = true;
-    } else if (input === 'flag' && !duringEncounter) {
-        previousAnnouncement = $('#announcer').text();
-        announce("Insert flag for 100 points. Pick color, type 'red', 'green', 'yellow' or 'cancel' to cancel.");
-        flagQuestion = true;
-    } else if (flagQuestion) {
-        if (input === 'red' || input === 'green' || input === 'yellow') {
-            // set flag
-            insertFlag(input);
-        } else if (input === 'cancel') {
-            // cancel flag setting
-            flagQuestion = false;
-            announce(previousAnnouncement);
-        } else {
-            announce("Unknown flag color. Type 'red', 'green', 'yellow' or 'cancel' to cancel.");
-        }
-    } else if (question) {
-        if (input === "yes") {
-            // Reset everything
-            duringGame = false;
-            duringEncounter = false;
-            question = false;
-            resetGame();
-            announce("Game has been reset. Type 'start' to begin again.");
-        } else if (input === "no") {
-            // Continue game
-            question = false;
-            announce(previousAnnouncement);
-        } else {
-            encounterAnnounce("Please answer with 'yes' or 'no'.");
-        }
-    } else if (directions.includes(input)) {
-        // Check if the player is during an encounter. If so, notify them and prevent movement.
-        if (duringEncounter) {
-            encounterAnnounce("You can't leave until you've dealt with the encounter!");
-        } else {
-            movePlayer(input);
-        }
-    } else if (duringEncounter) {
-        // Handle the encounter input
-        handleEncounterInput(input);
     } else {
         announce("Unknown command. Type 'help' for more instructions.");
     }
 }
 
+function handleGameState(input) {
+    if (input === "start") {
+        previousAnnouncement = $('#announcer').text();
+        announce("Do you want to return to the main menu? Type 'yes' or 'no'.");
+        question = true;
+    } else if (input === 'flag') {
+        previousAnnouncement = $('#announcer').text();
+        announce("Insert flag for 100 points. Pick color, type 'red', 'green', 'yellow' or 'cancel' to cancel.");
+        flagQuestion = true;
+    } else if (directions.includes(input)) {
+        movePlayer(input);
+    } else {
+        announce("Unknown command. Type 'help' for more instructions.");
+    }
+}
+
+function handleEncounterState(input) {
+    handleEncounterInput(input);
+}
+
+function handleQuestionState(input) {
+    if (input === "yes") {
+        duringGame = false;
+        duringEncounter = false;
+        question = false;
+        resetGame();
+        announce("Game has been reset. Type 'start' to begin again.");
+    } else if (input === "no") {
+        question = false;
+        announce(previousAnnouncement);
+    } else {
+        encounterAnnounce("Please answer with 'yes' or 'no'.");
+    }
+}
+
+function handleFlagQuestionState(input) {
+    if (input === 'red' || input === 'green' || input === 'yellow') {
+        insertFlag(input);
+    } else if (input === 'cancel') {
+        flagQuestion = false;
+        announce(previousAnnouncement);
+    } else {
+        announce("Unknown flag color. Type 'red', 'green', 'yellow' or 'cancel' to cancel.");
+    }
+}
+
 function insertFlag(color) {
-    // set current room encounter to red flag
-    maze[playerPosition.y][playerPosition.x].flag = color + '-flag';
-    flagQuestion = false;
-
-    // deduct 100 from score and show new score
+    setFlagInCurrentRoom(color);
     updateScore(-100);
-
-    encounterAnnounce(color + " flag set in this room!");
+    displayFlag(color);
+    flagQuestion = false;
+    encounterAnnounce(`${color} flag set in this room!`);
     announce(previousAnnouncement);
-    // add flag img to the room
-    $('#maze').append('<img class="flag" src="./dist/assets/flags/' + color + '-flag.jpg" alt="Flag">');
+}
+
+function setFlagInCurrentRoom(color) {
+    maze[playerPosition.y][playerPosition.x].flag = `${color}-flag`;
+}
+
+function displayFlag(color) {
+    $('#maze').append(`<img class="flag" src="./dist/assets/flags/${color}-flag.jpg" alt="Flag">`);
 }
 
 function checkForFlag() {
-    // Remove any existing flag images
     $('.flag').remove();
     const currentRoom = maze[playerPosition.y][playerPosition.x];
-
     if (currentRoom.flag) {
-        // add flag img to the room
-        $('#maze').append('<img class="flag" src="./dist/assets/flags/' + currentRoom.flag + '.jpg" alt="Flag">');
+        $('#maze').append(`<img class="flag" src="./dist/assets/flags/${currentRoom.flag}.jpg" alt="Flag">`);
     }
 }
 
@@ -192,20 +196,19 @@ function toggleHelpModal() {
 }
 
 function startEnemyTimer(numEnemies) {
-    enemyTimer = setInterval(function () {
+    const decrementScore = () => {
         updateScore(-100 * numEnemies);
-        // Stop the timer if score reaches zero
         if (score <= 0) {
-            clearInterval(enemyTimer);
+            stopEnemyTimer();
             updateScore(0);
         }
-    }, 2000);
+    };
+    enemyTimer = setInterval(decrementScore, 2000);
 }
 
 function stopEnemyTimer() {
     clearInterval(enemyTimer);
 }
-
 
 function handleEncounterInput(input) {
     if (!duringEncounter) return;
@@ -267,112 +270,49 @@ function handleEncounterInput(input) {
     }
 }
 
+function getEncounters(room) {
+    return Array.isArray(room.encounter) ? room.encounter : [room.encounter];
+}
+
+function getCurrentRoom() {
+    return maze[playerPosition.y][playerPosition.x];
+}
+
+function handleEncounter() {
+    const currentRoom = getCurrentRoom();
+    const encounters = getEncounters(currentRoom);
+    const currentEncounter = encounters[0];
+
+    let announcement = '';
+
+    if (mazeEnemies.includes(currentEncounter)) {
+        announcement = mazeData.enemies[currentEncounter].announcement;
+    } else if (mazeTreasures.includes(currentEncounter)) {
+        announcement = mazeData.treasures[currentEncounter].announcement;
+    } else if (currentEncounter === 'exit') {
+        announcement = "You've found the exit! Congratulations.";
+        gameOver();
+    }
+
+    if (announcement) {
+        announce(announcement);
+    }
+}
+
 function updateMazeVisualization() {
     // Clear any existing door elements from the previous room
     $('.doors').remove();
 
     // Fetch the current room based on player's position
-    const currentRoom = maze[playerPosition.y][playerPosition.x];
+    const { doors: currentDoors } = maze[playerPosition.y][playerPosition.x];
 
     // Check for available doors and inject them into the maze
-    for (const direction in currentRoom.doors) {
-        if (currentRoom.doors[direction]) {
-            $("#maze").append(doors[direction]);
+    const $maze = $("#maze");
+    for (const direction in currentDoors) {
+        if (currentDoors[direction]) {
+            $maze.append(doors[direction]);
         }
     }
-}
-
-function enterRoom() {
-    const currentRoom = maze[playerPosition.y][playerPosition.x];
-
-    // Reset encounterAnnouncer
-    encounterAnnounce("");
-
-    if (!currentRoom.visited && currentRoom.encounter !== null) {
-
-        // Remove flag img from the room if arrived from room where you set one
-        $('.flag').remove();
-
-        // Mark the room as visited
-        currentRoom.visited = true;
-
-        // Update the maze visualization
-        updateMazeVisualization();
-
-        // Initiate encounter state
-        duringEncounter = true;
-
-        // After 1 sec close doors
-        setTimeout(function () {
-            closeDoors();
-        }, 1000);
-
-        handleEncounter();
-
-        // after 2 sec add class 'fight' to elements .enemy--wrapper
-        setTimeout(function () {
-            $('.enemy--wrapper').addClass('fight');
-        }, 2000);
-
-        // Start decrementing score for each remaining undefeated enemy
-        if (Array.isArray(currentRoom.encounter)) {
-            const numEnemies = currentRoom.encounter.filter(e => mazeEnemies.includes(e)).length;
-            if (numEnemies > 0) {
-                startEnemyTimer(numEnemies);
-            }
-        } else if (mazeEnemies.includes(currentRoom.encounter)) {
-            startEnemyTimer(1);
-        }
-
-    } else {
-        announce("Nothing in this room");
-        updateMazeVisualization();
-        checkForFlag();
-    }
-
-    renderMazeInConsole();
-    displayEncounter(currentRoom);
-}
-
-function handleEncounter() {
-    const currentRoom = maze[playerPosition.y][playerPosition.x];
-    let encounters = currentRoom.encounter;
-
-    if (!encounters) return;
-
-    encounters = Array.isArray(encounters) ? encounters : [encounters];
-    const currentEncounter = encounters[0];
-
-    if (mazeEnemies.includes(currentEncounter)) {
-        const enemyData = mazeData.enemies[currentEncounter];
-        announce(enemyData.announcement);
-    } else if (mazeTreasures.includes(currentEncounter)) {
-        const treasureData = mazeData.treasures[currentEncounter];
-        announce(treasureData.announcement);
-    } else if (currentEncounter === 'exit') {
-        announce("You've found the exit! Congratulations.");
-        gameOver();
-    }
-}
-
-function gameOver() {
-    duringGame = false;
-    duringEncounter = false;
-
-    menuTrolls.show();
-    levelSelectWrapper.show();
-    menuHeader.show();
-
-    // add .game-over class to the hero element, .maze__score and .maze__rooms
-    $('.hero').addClass('game-over');
-    $('.maze__score').addClass('game-over');
-    $('.maze__rooms').addClass('game-over');
-
-    // delete the background images but not the .dancing-troll
-    $('.maze__menu-background').not('.dancing-troll').remove();
-
-    encounterAnnounce("Type start to play again.");
-
 }
 
 function displayEncounter(room) {
@@ -396,28 +336,88 @@ function displayEncounter(room) {
     }
 }
 
-function resetGame() {
-    // Revert all hidden menu items
+function enterRoom() {
+    const currentRoom = maze[playerPosition.y][playerPosition.x];
+    resetEncounterAnnouncer();
+
+    if (!currentRoom.visited && currentRoom.encounter !== null) {
+        handleFirstTimeEntry(currentRoom);
+    } else {
+        handleRepeatedEntry(currentRoom);
+    }
+
+    renderMazeInConsole();
+    displayEncounter(currentRoom);
+}
+
+function resetEncounterAnnouncer() {
+    encounterAnnounce("");
+}
+
+function handleFirstTimeEntry(currentRoom) {
+    $('.flag').remove();  // Remove flag img from the room if arrived from room where you set one
+    currentRoom.visited = true;  // Mark the room as visited
+    updateMazeVisualization();  // Update the maze visualization
+    duringEncounter = true;  // Initiate encounter state
+
+    setTimeout(() => closeDoors(), 1000);  // After 1 sec close doors
+    handleEncounter();  // Handle the encounter
+
+    setTimeout(() => $('.enemy--wrapper').addClass('fight'), 2000);  // After 2 sec add class 'fight' to elements .enemy--wrapper
+
+    const numEnemies = Array.isArray(currentRoom.encounter)
+        ? currentRoom.encounter.filter(e => mazeEnemies.includes(e)).length
+        : mazeEnemies.includes(currentRoom.encounter) ? 1 : 0;
+
+    if (numEnemies > 0) startEnemyTimer(numEnemies);
+}
+
+function handleRepeatedEntry(currentRoom) {
+    announce("Nothing in this room");
+    updateMazeVisualization();
+    checkForFlag();
+}
+
+function toggleGameOverClasses(add) {
+    const classes = ['hero', 'maze__score', 'maze__rooms'];
+    classes.forEach(cls => $(`.${cls}`).toggleClass('game-over', add));
+}
+
+function showMenuItems() {
     menuTrolls.show();
     levelSelectWrapper.show();
     menuHeader.show();
+}
 
-    //remove all .doors elements
-    $('.doors').remove();
-
-    // remove .game-over class from the hero element, .maze__score and .maze__rooms
-    $('.hero').removeClass('game-over');
-    $('.maze__score').removeClass('game-over');
-    $('.maze__rooms').removeClass('game-over');
-
-    // delete the background images but not the .dancing-troll
+function removeBackgroundImages() {
     $('.maze__menu-background').not('.dancing-troll').remove();
+}
+
+function gameOver() {
+    duringGame = false;
+    duringEncounter = false;
+
+    showMenuItems();
+    toggleGameOverClasses(true);
+    removeBackgroundImages();
+
+    encounterAnnounce("Type start to play again.");
+}
+
+function resetGame() {
+    showMenuItems();
+    $('.doors').remove();  // Remove all .doors elements
+    toggleGameOverClasses(false);
+    removeBackgroundImages();
 
     // Remove other classes from the hero element apart from .hero
     $('.hero').attr('class', 'hero');
 
     // Remove all images from the #encounter container
     $('#encounter').empty();
+
+    //cler encounter announcer
+    resetEncounterAnnouncer();
 
     // Unload Maze
     maze = null;
