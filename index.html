@@ -6,13 +6,12 @@
   <title>Maze</title>
   <link rel="stylesheet" href="./dist/css/main.css">
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.touchswipe/1.6.18/jquery.touchSwipe.min.js"></script>
 </head>
 <body>
-    <div class="header">
+    <header class="header">
         <h1>THE DUNGEON</h1>
-    </div>
-    <div class="game">
+    </header>
+    <main class="game">
         <div class="game__main">        
             <div class="maze" id="maze">
                 <h2 class="maze__score">Score: <span id="score">0</span></h2>
@@ -40,7 +39,7 @@
             </div>
             <input id="userInput" class="game__input" type="text" onSubmit="alert()">
         </div>
-    </div>
+    </main>
     <div class="help-modal hidden">
         <div class="help-modal__content">
             <h2>Instructions</h2>
@@ -50,17 +49,15 @@
             <p>You can change rooms typing directions 'north', 'south', 'east' and 'west'. You can only change rooms when all room encounters has been cleared.</p>
             <h2>Combat</h2>
             <p>When you encounter a creature you will have to fight it. You can attack by typing command that will be announced on the screen.</p>
+            <p>Every enemy deducts 100 points from your score every 2 seconds. Better beat them fast!</p>
             <h2>Flags</h2>
             <p>To help you navigate through the dungeon you can put a flag in the room when it's empty. Type 'flag' followed by typing it's color, you can pick 'red', 'green' or 'yellow'.</p>
             <p>Leaving a flag will cost you 100 score points! But will help you not get lost.</p>
-            <h2>Exit</h2>
-            <p>You found the exit room? Congratulations! Type 'exit' to finish the game.</p>
             <h2>Back to menu</h2>
             <p>At any point in the dungeon you can type 'start' again to be asked if you want to return to main menu</p>
             <a id="closeModal">Close</a>
         </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="./dist/js/main.js"></script>
 </body>
 </html>

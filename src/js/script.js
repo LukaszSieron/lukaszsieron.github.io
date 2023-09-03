@@ -113,20 +113,46 @@ function clearInitialRoom() {
  * @param {string} input - The user's input command.
  */
 function handleUserInput(input) {
+    // If a question is being asked, handle it first
+    if (question) {
+        handleQuestionState(input);
+        return; // Exit the function early
+    }
+
+    // Handle 'start' and 'help' commands at any point during the game
+    if (input === "start") {
+        if (duringGame) {
+            previousAnnouncement = $('#announcer').text();
+            announce("Do you want to return to the main menu? Type 'yes' or 'no'.");
+            question = true;
+            return; // Exit the function early
+        } else {
+            duringGame = true;
+            resetGame();
+            hideMenuItems();
+            loadMaze();
+            announce("You are in a maze. Try to find the exit. Type 'help' for more instructions.");
+            return; // Exit the function early
+        }
+    } else if (input === "help") {
+        toggleHelpModal();
+        return; // Exit the function early
+    }
+
+    // Existing logic for other states
     if (!duringGame) {
         handleMenuState(input);
     } else if (duringGame && !duringEncounter && !question && !flagQuestion) {
         handleGameState(input);
     } else if (duringEncounter) {
         handleEncounterInput(input);
-    } else if (question) {
-        handleQuestionState(input);
     } else if (flagQuestion) {
         handleFlagQuestionState(input);
     } else {
         announce("Unknown command. Type 'help' for more instructions.");
     }
 }
+
 
 /**
  * Handles user input when the game is in the menu state.
