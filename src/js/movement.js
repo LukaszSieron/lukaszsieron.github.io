@@ -1,3 +1,7 @@
+/**
+ * Moves the player in the specified direction if possible.
+ * @param {string} direction - The direction to move the player in ("north", "south", "east", "west").
+ */
 function movePlayer(direction) {
     let newX = playerPosition.x;
     let newY = playerPosition.y;
@@ -28,10 +32,21 @@ function movePlayer(direction) {
     }
 }
 
+/**
+ * Checks if the player can move to the specified coordinates.
+ * @param {number} x - The x-coordinate to move to.
+ * @param {number} y - The y-coordinate to move to.
+ * @param {string} direction - The direction to move in.
+ * @returns {boolean} - Whether the player can move to the specified coordinates.
+ */
 function canMoveTo(x, y, direction) {
     return x >= 0 && y >= 0 && x < mazeSize && y < mazeSize && maze[playerPosition.y][playerPosition.x].doors[direction];
 }
 
+/**
+ * Handles the player entering a room from a specific direction.
+ * @param {string} direction - The direction from which the player is entering the room.
+ */
 function enterRoomFromDirection(direction) {
     const currentRoom = maze[playerPosition.y][playerPosition.x];
     let isEncounterInThatRoom = currentRoom.encounter !== null;
@@ -64,6 +79,10 @@ function enterRoomFromDirection(direction) {
     enterRoom();
 }
 
+/**
+ * Handles the player leaving a room in a specific direction.
+ * @param {string} direction - The direction in which the player is leaving the room.
+ */
 function leaveRoomInDirection(direction) {
     let animationName = '';
     switch (direction) {
@@ -88,6 +107,9 @@ function leaveRoomInDirection(direction) {
 
 }
 
+/**
+ * Moves the player to the center of the room after an encounter.
+ */
 function moveToCenter() {
     const hero = $('.hero');
     const directionMap = {
